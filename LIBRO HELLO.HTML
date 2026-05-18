@@ -1,0 +1,882 @@
+<!doctype html>
+<html lang=es>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>Libro Hello Kitty 🌸</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Comic+Neue:wght@400;700&display=swap" rel=stylesheet>
+<style>
+:root {
+  --book-w: 960px;
+  --book-h: 620px;
+  --page-w: calc(var(--book-w) / 2);
+  --page-h: var(--book-h);
+  --persp: 3600px;
+  --cover-bg: #ff66b2;
+  --cover-accent: #ffccdc;
+  --ink: #333333;
+  --radius: 14px;
+  --pink-light: #ffccdc;
+  --pink-dark: #ff66b2;
+  --yellow: #ffd700;
+  --blue: #66ccff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body, html {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Comic Neue', cursive;
+  background: linear-gradient(120deg, #ffccdc, #ff99cc, #ff66b2, #ffccff);
+  background-size: 400% 400%;
+  animation: gradientShift 30s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+.stars {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0;
+  animation: twinkle linear infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: .2; transform: scale(.8); }
+  50% { opacity: 1; transform: scale(1.4); }
+}
+
+.hearts-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 11000;
+}
+
+.heart-float {
+  position: absolute;
+  opacity: .7;
+  font-size: 1.8rem;
+  animation: floatUp linear forwards;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: .7;
+  }
+  100% {
+    transform: translateY(-120vh) scale(1.5);
+    opacity: 0;
+  }
+}
+
+.scene {
+  position: fixed;
+  inset: 0;
+  perspective: var(--persp);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+.book {
+  width: var(--book-w);
+  height: var(--book-h);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-style: preserve-3d;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(.9);
+  transition: opacity 1s ease, transform 1s cubic-bezier(.25, .8, .25, 1);
+}
+
+.book.ready {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.sheet {
+  width: var(--page-w);
+  height: var(--page-h);
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  border-radius: var(--radius);
+  overflow: visible;
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.face.left {
+  transform: rotateY(180deg);
+}
+
+.inner {
+  position: absolute;
+  inset: 0;
+}
+
+.cover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: var(--radius);
+  color: #fff;
+  padding: 40px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, .3);
+}
+
+.cover h1 {
+  font-family: 'Great Vibes', cursive;
+  font-size: 5rem;
+  margin: 0 0 1rem;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, .4);
+  color: #fff;
+}
+
+.cover p {
+  font-size: 2.2rem;
+  margin: 0;
+  color: #ffccdc;
+}
+
+.cover-back {
+  color: var(--pink-light);
+}
+
+.page {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  text-align: center;
+  font-size: 2.2rem;
+  line-height: 1.6;
+  background: linear-gradient(135deg, #fff0f5, #ffe4e9);
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, .1);
+  z-index: 0;
+}
+
+.page:nth-child(2n) {
+  background: linear-gradient(135deg, #fffafa, #f5f5f5);
+}
+
+.folio {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  font-size: 1.2rem;
+  opacity: .5;
+}
+
+.shadow {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .35s ease;
+  mix-blend-mode: multiply;
+  z-index: 0;
+}
+
+.curl-overlay,
+.edge-spec,
+.specular {
+  z-index: 1;
+}
+
+.curl-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.edge-spec {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  right: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, .04), rgba(255, 255, 255, .08), rgba(0, 0, 0, .04));
+  filter: blur(.4px);
+  opacity: 0;
+}
+
+.specular {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  mix-blend-mode: screen;
+  background: radial-gradient(100% 60% at 35% 50%, rgba(255, 255, 255, .2) 0, rgba(255, 255, 255, .06) 35%, transparent 60%);
+}
+
+.edge-spec,
+.specular {
+  pointer-events: none;
+}
+
+.character-title {
+  font-family: 'Great Vibes', cursive;
+  font-size: 3.5rem;
+  color: var(--pink-dark);
+  margin-bottom: 20px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, .1);
+}
+
+.character-desc {
+  font-size: 1.8rem;
+  max-width: 80%;
+  margin-top: 20px;
+  color: #555;
+}
+
+.audio-btn {
+  pointer-events: auto !important;
+  z-index: 9999 !important;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 102, 178, .8);
+  color: #fff;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, .2);
+}
+
+.audio-btn:hover {
+  background: rgba(255, 102, 178, 1);
+  transform: scale(1.1);
+}
+
+.sticker {
+  position: absolute;
+  font-size: 3rem;
+  opacity: .8;
+  animation: floatSticker 3s ease-in-out infinite;
+}
+
+@keyframes floatSticker {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+.bow {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: var(--pink-dark);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  animation: spinBow 4s linear infinite;
+}
+
+@keyframes spinBow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+</head>
+<body>
+<div class=stars id=stars></div>
+<div class=scene id=scene>
+  <div class="book closed closed-front" id=book></div>
+</div>
+<div class=hearts-container id=hearts></div>
+
+<script>
+!function() {
+  const starsContainer = document.getElementById("stars");
+  const heartsContainer = document.getElementById("hearts");
+  const book = document.getElementById("book");
+  const scene = document.getElementById("scene");
+  
+  let isPortrait = false;
+  
+  function checkOrientation() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    isPortrait = h > w;
+  }
+  
+  window.addEventListener("resize", checkOrientation);
+  window.addEventListener("orientationchange", checkOrientation);
+  checkOrientation();
+  
+  // Crear estrellas titilantes
+  for(let i = 0; i < 80; i++) {
+    const star = document.createElement("div");
+    star.className = "star";
+    star.style.left = (100 * Math.random()) + "%";
+    star.style.top = (100 * Math.random()) + "%";
+    const size = 2 * Math.random() + 1;
+    star.style.width = size + "px";
+    star.style.height = size + "px";
+    star.style.animationDuration = (5 * Math.random() + 3) + "s";
+    star.style.animationDelay = (10 * Math.random()) + "s";
+    starsContainer.appendChild(star);
+  }
+  
+  // Crear corazones flotantes
+  setInterval(() => {
+    const heart = document.createElement("div");
+    heart.className = "heart-float";
+    heart.textContent = ["❤️", "💗", "💖", "💕", "🌸", "🎀", "🐱"][Math.floor(Math.random() * 7)];
+    heart.style.left = (100 * Math.random()) + "%";
+    heart.style.fontSize = (1.5 * Math.random() + 1) + "rem";
+    heart.style.animationDuration = (3 * Math.random() + 3) + "s";
+    heartsContainer.appendChild(heart);
+    setTimeout(() => heart.remove(), 7000);
+  }, 800);
+  
+  // Datos de las páginas (personajes de Hello Kitty)
+  const pagesData = [
+    {
+      title: "Hello Kitty",
+      desc: "La gatita más adorable de Sanrio, nacida en Londres. Le encanta hacer pasteles y hacer nuevos amigos.",
+      color: "#ff66b2",
+      emoji: "🐱"
+    },
+    {
+      title: "My Melody",
+      desc: "La dulce conejita que siempre lleva su capucha roja. Es la mejor amiga de Hello Kitty.",
+      color: "#ff99cc",
+      emoji: "🐰"
+    },
+    {
+      title: "Keroppi",
+      desc: "La rana alegre que vive cerca del estanque Donut. Le encanta jugar béisbol con sus amigos.",
+      color: "#66cc66",
+      emoji: "🐸"
+    },
+    {
+      title: "Cinnamoroll",
+      desc: "El perrito esponjoso con orejas largas que le permiten volar. Le encanta dormir en las nubes.",
+      color: "#66ccff",
+      emoji: "☁️"
+    },
+    {
+      title: "Pompompurin",
+      desc: "El perrito dorado relajado con su gorra de marinero. Su postre favorito es el budín.",
+      color: "#ffcc00",
+      emoji: "🍮"
+    },
+    {
+      title: "Kuromi",
+      desc: "La traviesa conejita que escribe en su diario secreto. Aunque parece mala, tiene buen corazón.",
+      color: "#9966cc",
+      emoji: "👿"
+    }
+  ];
+  
+  const totalPages = pagesData.length;
+  const audioPlayers = {};
+  const audioButtons = {};
+  
+  // Función para detener todos los audios excepto el actual
+  function stopAllAudios(currentPage) {
+    for(const pageNum in audioPlayers) {
+      if(+pageNum !== currentPage) {
+        audioPlayers[pageNum].pause();
+        audioButtons[pageNum] && (audioButtons[pageNum].textContent = "▶️");
+      }
+    }
+  }
+  
+  // Función para crear una página del libro
+  function createPage(pageNum) {
+    const page = document.createElement("div");
+    page.className = "page";
+    
+    // Fondo pastel diferente para cada página
+    const hue = (pageNum * 60) % 360;
+    page.style.background = `linear-gradient(135deg, hsl(${hue}, 70%, 95%), hsl(${hue}, 50%, 85%))`;
+    
+    const pageData = pagesData[pageNum - 1];
+    
+    // Contenido de la página
+    page.innerHTML = `
+      <div class="character-title">${pageData.emoji} ${pageData.title}</div>
+      <div class="character-desc">${pageData.desc}</div>
+      <div class="folio">Página ${pageNum}</div>
+    `;
+    
+    // Crear audio para esta página
+    const audio = document.createElement("audio");
+    audio.src = getAudioForPage(pageNum);
+    audio.preload = "none";
+    audio.controls = false;
+    audio.style.display = "none";
+    page.appendChild(audio);
+    
+    // Crear botón de audio
+    const audioBtn = document.createElement("button");
+    audioBtn.textContent = "▶️";
+    audioBtn.className = "audio-btn";
+    audioBtn.title = "Reproducir música";
+    
+    // Eventos para el botón de audio
+    const stopPropagation = (e) => {
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+    };
+    
+    audioBtn.addEventListener("pointerdown", stopPropagation);
+    audioBtn.addEventListener("mousedown", stopPropagation);
+    audioBtn.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      stopPropagation(e);
+    }, { passive: false });
+    
+    audioBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if(audio.paused) {
+        stopAllAudios(pageNum);
+        audio.play().then(() => {
+          audioBtn.textContent = "⏸️";
+        }).catch(e => console.warn("Audio bloqueado:", e));
+      } else {
+        audio.pause();
+        audioBtn.textContent = "▶️";
+      }
+    });
+    
+    audioBtn.addEventListener("touchend", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if(audio.paused) {
+        stopAllAudios(pageNum);
+        audio.play().then(() => {
+          audioBtn.textContent = "⏸️";
+        }).catch(e => console.warn("Audio bloqueado:", e));
+      } else {
+        audio.pause();
+        audioBtn.textContent = "▶️";
+      }
+    }, { passive: false });
+    
+    audioPlayers[pageNum] = audio;
+    audioButtons[pageNum] = audioBtn;
+    page.appendChild(audioBtn);
+    
+    // Añadir stickers decorativos
+    for(let i = 0; i < 3; i++) {
+      const sticker = document.createElement("div");
+      sticker.className = "sticker";
+      sticker.textContent = ["🌸", "🎀", "⭐", "🍰", "🐱"][Math.floor(Math.random() * 5)];
+      sticker.style.left = (20 + 60 * Math.random()) + "%";
+      sticker.style.top = (20 + 60 * Math.random()) + "%";
+      sticker.style.animationDelay = (Math.random() * 2) + "s";
+      sticker.style.fontSize = (1.5 + Math.random()) + "rem";
+      page.appendChild(sticker);
+    }
+    
+    return page;
+  }
+  
+  // URLs de audio (puedes reemplazar con tus propias canciones)
+  function getAudioForPage(pageNum) {
+    const audioUrls = [
+      "https://assets.mixkit.co/music/preview/mixkit-clear-sky-479.mp3",
+      "https://assets.mixkit.co/music/preview/mixkit-sweet-lullaby-125.mp3",
+      "https://assets.mixkit.co/music/preview/mixkit-funny-kitchen-229.mp3",
+      "https://assets.mixkit.co/music/preview/mixkit-christmas-magic-567.mp3",
+      "https://assets.mixkit.co/music/preview/mixkit-golden-glow-486.mp3",
+      "https://assets.mixkit.co/music/preview/mixkit-mysterious-wind-232.mp3"
+    ];
+    return audioUrls[(pageNum - 1) % audioUrls.length];
+  }
+  
+  // Precargar audios al primer toque
+  document.addEventListener("touchstart", () => {
+    for(const pageNum in audioPlayers) {
+      audioPlayers[pageNum].load();
+    }
+  }, { once: true });
+  
+  // Crear portada
+  function createCover() {
+    const cover = document.createElement("div");
+    cover.className = "cover";
+    cover.innerHTML = `
+      <h1>Hello Kitty</h1>
+      <p>Libro Mágico de Amigos</p>
+      <div style="margin-top: 30px; font-size: 4rem;">🌸 🎀 🐱 🎀 🌸</div>
+    `;
+    cover.style.background = "linear-gradient(135deg, #ff66b2, #ff99cc, #ffccdc)";
+    
+    // Añadir moño decorativo
+    const bow = document.createElement("div");
+    bow.className = "bow";
+    bow.style.left = "50%";
+    bow.style.top = "20%";
+    bow.style.transform = "translateX(-50%)";
+    cover.appendChild(bow);
+    
+    return cover;
+  }
+  
+  // Crear contratapa
+  function createBackCover() {
+    const backCover = document.createElement("div");
+    backCover.className = "cover cover-back";
+    backCover.innerHTML = `
+      <div style="font-size: 3rem; margin-bottom: 20px;">💝</div>
+      <h2 style="font-size: 3rem; margin-bottom: 20px;">Gracias por leer</h2>
+      <p style="font-size: 1.8rem;">¡La amistad es mágica!</p>
+      <div style="margin-top: 40px; font-size: 3rem;">
+        🐱 🐰 🐸 ☁️ 🍮 👿
+      </div>
+    `;
+    backCover.style.background = "linear-gradient(135deg, #ffccdc, #ff99cc, #ff66b2)";
+    
+    return backCover;
+  }
+  
+  // Crear hojas del libro
+  const sheets = [];
+  
+  for(let i = 0; i <= totalPages; i++) {
+    const sheet = document.createElement("div");
+    sheet.className = "sheet";
+    sheet.dataset.i = i;
+    sheet._a = 0; // Ángulo actual
+    sheet._t = 0; // Ángulo objetivo
+    sheet._v = 0; // Velocidad
+    sheet.style.zIndex = 4000 - i;
+    
+    // Cara derecha
+    const faceRight = document.createElement("div");
+    faceRight.className = "face right";
+    
+    // Cara izquierda
+    const faceLeft = document.createElement("div");
+    faceLeft.className = "face left";
+    
+    // Contenido interno derecho
+    const innerRight = document.createElement("div");
+    innerRight.className = "inner";
+    
+    // Contenido interno izquierdo
+    const innerLeft = document.createElement("div");
+    innerLeft.className = "inner";
+    
+    if(i === 0) {
+      // Primera página: portada
+      innerRight.appendChild(createCover());
+      innerLeft.appendChild(createPage(1));
+    } else if(i === totalPages) {
+      // Última página: página final y contratapa
+      innerRight.appendChild(createPage(totalPages));
+      innerLeft.appendChild(createBackCover());
+    } else {
+      // Páginas intermedias
+      const leftPageNum = 2 * i;
+      const rightPageNum = 2 * i + 1;
+      
+      if(leftPageNum <= totalPages) {
+        innerRight.appendChild(createPage(leftPageNum));
+      }
+      if(rightPageNum <= totalPages) {
+        innerLeft.appendChild(createPage(rightPageNum));
+      }
+    }
+    
+    // Añadir efectos visuales
+    const curlOverlayR = document.createElement("div");
+    curlOverlayR.className = "curl-overlay";
+    const curlOverlayL = document.createElement("div");
+    curlOverlayL.className = "curl-overlay";
+    
+    const specularR = document.createElement("div");
+    specularR.className = "specular";
+    const specularL = document.createElement("div");
+    specularL.className = "specular";
+    
+    const edgeSpecR = document.createElement("div");
+    edgeSpecR.className = "edge-spec";
+    const edgeSpecL = document.createElement("div");
+    edgeSpecL.className = "edge-spec";
+    
+    const shadow = document.createElement("div");
+    shadow.className = "shadow";
+    
+    faceRight.appendChild(innerRight);
+    faceRight.appendChild(curlOverlayR);
+    faceRight.appendChild(specularR);
+    faceRight.appendChild(edgeSpecR);
+    
+    faceLeft.appendChild(innerLeft);
+    faceLeft.appendChild(curlOverlayL);
+    faceLeft.appendChild(specularL);
+    faceLeft.appendChild(edgeSpecL);
+    
+    sheet.appendChild(faceRight);
+    sheet.appendChild(faceLeft);
+    sheet.appendChild(shadow);
+    
+    // Guardar referencias
+    sheet._shadow = shadow;
+    sheet._curlR = curlOverlayR;
+    sheet._curlL = curlOverlayL;
+    sheet._specR = specularR;
+    sheet._specL = specularL;
+    sheet._edgeR = edgeSpecR;
+    sheet._edgeL = edgeSpecL;
+    
+    // Eventos de interacción
+    sheet.addEventListener("pointerdown", startDrag);
+    sheet.addEventListener("touchstart", startDrag);
+    
+    book.appendChild(sheet);
+    sheets.push(sheet);
+  }
+  
+  let currentPage = 0;
+  const frameRate = 1/60;
+  let animating = false;
+  
+  // Función de animación
+  function animate() {
+    animating = true;
+    let moved = false;
+    
+    for(const sheet of sheets) {
+      const target = sheet._t;
+      const current = sheet._a;
+      const velocity = sheet._v;
+      
+      // Física del volteo
+      sheet._v += (14 * (target - current) - 5 * velocity) * frameRate;
+      sheet._a += sheet._v * frameRate;
+      
+      if(sheet._a < 0) {
+        sheet._a = 0;
+        sheet._v = 0;
+      }
+      if(sheet._a > Math.PI) {
+        sheet._a = Math.PI;
+        sheet._v = 0;
+      }
+      
+      // Aplicar rotación
+      const angle = -180 * sheet._a / Math.PI;
+      sheet.style.transform = `rotateY(${angle}deg)`;
+      
+      // Efectos de sombra
+      const progress = sheet._a / Math.PI;
+      if(progress > 0 && progress < 1) {
+        const shadowIntensity = progress < 0.5 ? 0.55 * progress : 0.55 * (1 - progress);
+        const shadowPos = 60 + 90 * progress;
+        sheet._shadow.style.background = 
+          `radial-gradient(120% 100% at ${100 * progress}% 50%, 
+           rgba(0,0,0,${shadowIntensity}) 0%, 
+           rgba(0,0,0,${0.5 * shadowIntensity}) ${shadowPos}%, 
+           transparent 100%)`;
+        sheet._shadow.style.opacity = shadowIntensity > 0.01 ? 1 : 0;
+      } else {
+        sheet._shadow.style.opacity = 0;
+      }
+      
+      // Actualizar z-index
+      const zAngle = 180 * sheet._a / Math.PI;
+      sheet.style.zIndex = zAngle < 90 ? 4000 - +sheet.dataset.i : +sheet.dataset.i + 6000;
+      
+      if(Math.abs(target - current) > 0.001) {
+        moved = true;
+      }
+    }
+    
+    if(moved) {
+      requestAnimationFrame(animate);
+    } else {
+      animating = false;
+    }
+  }
+  
+  // Ajustar tamaño del libro
+  function resizeBook() {
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    const bookWidth = parseFloat(getComputedStyle(document.documentElement)
+      .getPropertyValue("--book-w"));
+    const bookHeight = parseFloat(getComputedStyle(document.documentElement)
+      .getPropertyValue("--book-h"));
+    
+    let rotation = 0;
+    let scale;
+    
+    if(isPortrait) {
+      rotation = 90;
+      heartsContainer.classList.add("horizontal");
+      scale = Math.min((screenWidth - 32) / bookHeight, 
+                       (screenHeight - 32) / bookWidth);
+    } else {
+      rotation = 0;
+      heartsContainer.classList.remove("horizontal");
+      scale = Math.min((screenWidth - 32) / bookWidth, 
+                       (screenHeight - 32) / bookHeight);
+    }
+    
+    let offsetX = 0;
+    let offsetY = 0;
+    
+    if(rotation === 0) {
+      if(currentPage === 0) offsetX = -bookWidth/4 * scale;
+      if(currentPage === sheets.length) offsetX = bookWidth/4 * scale;
+    } else {
+      if(currentPage === 0) offsetY = -bookWidth/4 * scale;
+      if(currentPage === sheets.length) offsetY = bookWidth/4 * scale;
+    }
+    
+    book.style.transition = "transform 0.9s cubic-bezier(.25,1.5,.5,1)";
+    book.style.transform = 
+      `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) 
+       rotate(${rotation}deg) scale(${scale})`;
+  }
+  
+  let dragInfo = null;
+  
+  function getEventPosition(event) {
+    if(event.touches && event.touches.length) {
+      return {
+        x: event.touches[0].clientX,
+        y: event.touches[0].clientY
+      };
+    }
+    return {
+      x: event.clientX,
+      y: event.clientY
+    };
+  }
+  
+  function startDrag(event) {
+    const pos = getEventPosition(event);
+    const sheet = event.currentTarget;
+    const sheetIndex = +sheet.dataset.i;
+    
+    if(sheetIndex !== currentPage && sheetIndex !== currentPage - 1) return;
+    
+    dragInfo = {
+      sheet: sheet,
+      index: sheetIndex,
+      startX: pos.x,
+      startY: pos.y,
+      startAngle: sheet._a
+    };
+    
+    sheet.style.zIndex = 8000;
+    
+    if(event.type.startsWith("pointer")) {
+      sheet.setPointerCapture(event.pointerId);
+    }
+    
+    document.addEventListener("pointermove", dragMove);
+    document.addEventListener("pointerup", endDrag, { once: true });
+    document.addEventListener("touchmove", dragMove, { passive: false });
+    document.addEventListener("touchend", endDrag, { once: true });
+  }
+  
+  function dragMove(event) {
+    if(!dragInfo) return;
+    if(event.cancelable) event.preventDefault();
+    
+    const pos = getEventPosition(event);
+    const { sheet, startX, startY, startAngle } = dragInfo;
+    
+    let delta, containerSize;
+    
+    if(isPortrait) {
+      delta = pos.y - startY;
+      containerSize = scene.clientHeight / 2;
+    } else {
+      delta = pos.x - startX;
+      containerSize = scene.clientWidth / 2;
+    }
+    
+    let angle = startAngle - (delta / containerSize) * Math.PI;
+    angle = Math.max(0, Math.min(Math.PI, angle));
+    
+    sheet._t = angle;
+    
+    if(!animating) animate();
+  }
+  
+  function endDrag() {
+    if(!dragInfo) return;
+    
+    const { sheet, index } = dragInfo;
+    dragInfo = null;
+    
+    document.removeEventListener("pointermove", dragMove);
+    document.removeEventListener("touchmove", dragMove);
+    
+    const shouldFlip = sheet._a >= Math.PI / 2;
+    sheet._t = shouldFlip ? Math.PI : 0;
+    currentPage = shouldFlip ? Math.max(currentPage, index + 1) : Math.min(currentPage, index);
+    
+    if(!animating) animate();
+    resizeBook();
+  }
+  
+  // Inicializar
+  window.addEventListener("resize", resizeBook);
+  window.addEventListener("orientationchange", resizeBook);
+  window.addEventListener("load", () => {
+    resizeBook();
+    setTimeout(() => book.classList.add("ready"), 100);
+  });
+}();
+</script>
+</body>
+</html>

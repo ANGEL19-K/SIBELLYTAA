@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú - Para mi Sibellyta</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Marcellus&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="ui-container">
+        
+        <header class="header">
+            <h1 class="main-title">PARA MI SIBELLYTA</h1>
+            <div class="title-dots">✦ ✦ ✦</div>
+        </header>
+
+        <main class="menu-layout">
+            
+            <!-- COLUMNA IZQUIERDA -->
+            <nav class="menu-column left">
+                <button id="btn-cartas" class="menu-btn"><span>CARTITAS PARA TI</span> <span class="icon">⚔️</span></button>
+                <button id="btn-paginas" class="menu-btn"><span>PAGINAS PARA TI</span> <span class="icon">🗺️</span></button>
+            </nav>
+
+            <!-- SUB-MENÚ 1: CARTITAS PARA TI -->
+            <div id="sub-menu-cartas" class="sub-menu-container hidden">
+                <h3 class="sub-menu-title">📜 PALABRAS DESDE EL CORAZÓN 📜</h3>
+                <div class="sub-menu-grid">
+                    <a href="Carta.html" class="sub-menu-item">CARTA PARA TI</a>
+                </div>
+                <button id="btn-cerrar-cartas" class="close-sub-menu">✕ Volver al Menú</button>
+            </div>
+
+            <!-- SUB-MENÚ 2: PÁGINAS DEDICADAS -->
+            <div id="sub-menu-paginas" class="sub-menu-container hidden">
+                <h3 class="sub-menu-title">✨ TUS SITIOS ESPECIALES ✨</h3>
+                <div class="sub-menu-grid">
+                    <a href="teamo.html" class="sub-menu-item">CANCION PARA TI</a>
+                    <a href="corazon.html" class="sub-menu-item">CORAZON PARA TI</a>
+                    <a href="FELIZ AÑO NUEVO SIBELLYTA.html" class="sub-menu-item">FELIZ AÑO NUEVO SIBELLYTA</a>
+                    <a href="Galaxi pa Sibe.html" class="sub-menu-item">GALAXIA PARA TI</a>
+                    <a href="hello.html" class="sub-menu-item">JUGAMOS?</a>
+                    <a href="sibellyta1.html" class="sub-menu-item">FLORECITA</a>
+                    <a href="SIBELLYTAHERMOSA.html" class="sub-menu-item">REGRESO A SENATI</a>
+                    <a href="galaxia_corazon.html" class="sub-menu-item">ESFERA MUSICAL</a>
+                    <a href="Libro-del-Amor.html" class="sub-menu-item">LIBRO PARA TI</a>
+                    <a href="Libro-Marvel-❤️.html" class="sub-menu-item">LIBRO DE MARVEL</a>
+                    <a href="Ramo-de-Flores.html" class="sub-menu-item">RAMO DE FLORES</a>
+                    <a href="Ruleta-del-Amor.html" class="sub-menu-item">RULETA</a>
+                </div>
+                <button id="btn-cerrar-paginas" class="close-sub-menu">✕ Volver al Menú</button>
+            </div>
+
+            <!-- SUB-MENÚ 3: COSAS POR HACER -->
+            <div id="sub-menu-cosas" class="sub-menu-container hidden">
+                <h3 class="sub-menu-title">🏆 NUESTRAS AVENTURAS 🏆</h3>
+                <div class="sub-menu-grid">
+                    <a href="Contador-de-Fechas-Especiales.html" class="sub-menu-item">GENERAR UNA CITAS</a>
+                </div>
+                <button id="btn-cerrar-cosas" class="close-sub-menu">✕ Volver al Menú</button>
+            </div>
+
+            <!-- SUB-MENÚ 4: GALERÍA -->
+            <div id="sub-menu-galeria" class="sub-menu-container hidden">
+                <h3 class="sub-menu-title">🖼️ RECUERDOS INMORTALES 🖼️</h3>
+                <div class="sub-menu-grid">
+                    <a href="fotos.html" class="sub-menu-item">📸 NUESTRO ÁLBUM DE FOTOS</a>
+                </div>
+                <button id="btn-cerrar-galeria" class="close-sub-menu">✕ Volver al Menú</button>
+            </div>
+
+            <!-- COLUMNA DERECHA -->
+            <nav class="menu-column right">
+                <button id="btn-cosas" class="menu-btn"><span class="icon">🏆</span> <span>COSAS PARA HACER</span></button>
+                <button id="btn-galeria" class="menu-btn"><span class="icon">🖼️</span> <span>GALERÍA</span></button>
+            </nav>
+            
+        </main>
+        
+    </div>
+
+    <!-- Script de control maestro para los 4 menús -->
+    <script>
+        // Array con la configuración de todos los menús para optimizar el código
+        const menus = [
+            { btn: 'btn-cartas', panel: 'sub-menu-cartas', close: 'btn-cerrar-cartas' },
+            { btn: 'btn-paginas', panel: 'sub-menu-paginas', close: 'btn-cerrar-paginas' },
+            { btn: 'btn-cosas', panel: 'sub-menu-cosas', close: 'btn-cerrar-cosas' },
+            { btn: 'btn-galeria', panel: 'sub-menu-galeria', close: 'btn-cerrar-galeria' }
+        ];
+
+        // Función global para cerrar todos los paneles activos
+        function ocultarTodosLosMenus() {
+            menus.forEach(m => {
+                const el = document.getElementById(m.panel);
+                el.classList.remove('visible');
+                el.classList.add('hidden');
+            });
+        }
+
+        // Asignación automática de eventos abrir/cerrar
+        menus.forEach(m => {
+            const botonAbrir = document.getElementById(m.btn);
+            const panelMenu = document.getElementById(m.panel);
+            const botonCerrar = document.getElementById(m.close);
+
+            botonAbrir.addEventListener('click', () => {
+                const yaEstaAbierto = panelMenu.classList.contains('visible');
+                ocultarTodosLosMenus(); // Cierra cualquier otro menú abierto primero
+                
+                if (!yaEstaAbierto) {
+                    panelMenu.classList.remove('hidden');
+                    panelMenu.classList.add('visible');
+                }
+            });
+
+            botonCerrar.addEventListener('click', (e) => {
+                e.stopPropagation(); // Evita conflictos de clics
+                panelMenu.classList.remove('visible');
+                panelMenu.classList.add('hidden');
+            });
+        });
+    </script>
+
+</body>
+</html>

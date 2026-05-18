@@ -1,0 +1,311 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    height: 100vh;
+    font-family: 'Marcellus', serif;
+    overflow: hidden; /* Evita que la pantalla haga scroll */
+    
+    /* Configuración de la imagen de fondo */
+    background-image: url('fondo.png');
+    background-size: cover; /* Hace que la imagen cubra toda la pantalla */
+    background-position: center; /* Centra la imagen */
+    background-repeat: no-repeat; /* Evita que la imagen se duplique */
+    background-color: #050510; /* Color oscuro por si la imagen tarda en cargar */
+    
+    /* Sombreado oscuro para resaltar la interfaz sobre la imagen */
+    box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.35);
+}
+
+/* --- CONTENEDOR PRINCIPAL --- */
+.ui-container {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+    padding: 40px 50px;
+    color: #fff;
+}
+
+/* --- CABECERA Y TÍTULO --- */
+.header {
+    text-align: center;
+    margin-top: 2vh;
+    animation: fadeInDown 1.5s ease-out;
+}
+
+.main-title {
+    font-family: 'Cinzel', serif;
+    font-size: 4.5rem;
+    letter-spacing: 8px;
+    margin: 0;
+    
+    /* Gradiente dorado elegante */
+    background: linear-gradient(to bottom, #fffde7 0%, #d4af37 50%, #b8860b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    
+    /* Efecto Glow (brillo) */
+    text-shadow: 0 0 25px rgba(212, 175, 55, 0.4), 
+                 0 4px 10px rgba(0, 0, 0, 0.8);
+}
+
+.title-dots {
+    color: #d4af37;
+    font-size: 1.5rem;
+    margin-top: 5px;
+    text-shadow: 0 0 15px rgba(212, 175, 55, 0.8);
+}
+
+/* --- DISPOSICIÓN DEL MENÚ (Lados) --- */
+.menu-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-grow: 1;
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+}
+
+.menu-column {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    width: 320px;
+}
+
+/* --- ESTILO DE LOS BOTONES (Glassmorphism) --- */
+.menu-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    color: #f4f4f4;
+    padding: 16px 25px;
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    background: transparent;
+    cursor: pointer;
+    
+    /* Cristal esmerilado */
+    background: rgba(15, 15, 25, 0.45);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    
+    /* Bordes estilo fantasía */
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-left: 3px solid #d4af37;
+    border-right: 3px solid #d4af37;
+    border-radius: 4px;
+    
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6), 
+                inset 0 0 10px rgba(212, 175, 55, 0.05);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Efecto Hover */
+.menu-btn:hover {
+    background: rgba(212, 175, 55, 0.25);
+    border-color: rgba(212, 175, 55, 0.9);
+    color: #fff;
+    transform: scale(1.06);
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.5), 
+                inset 0 0 20px rgba(212, 175, 55, 0.2);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+/* Destello de luz animado */
+.menu-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: skewX(-25deg);
+    transition: all 0.6s ease;
+}
+
+.menu-btn:hover::before {
+    left: 150%;
+}
+
+.menu-btn .icon {
+    font-size: 1.2rem;
+    opacity: 0.8;
+}
+
+/* --- FOOTER --- */
+.footer {
+    text-align: center;
+    font-size: 0.8rem;
+    letter-spacing: 4px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 2vh;
+    font-family: 'Cinzel', serif;
+}
+
+/* --- SUB-MENÚ DESPLEGABLE (ESTILOS COMPARTIDOS) --- */
+.sub-menu-container {
+    background: rgba(10, 10, 20, 0.92); 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 2px solid rgba(212, 175, 55, 0.5);
+    border-radius: 8px;
+    padding: 30px;
+    width: 420px;
+    text-align: center;
+    box-shadow: 0 0 35px rgba(0, 0, 0, 0.9), 0 0 20px rgba(212, 175, 55, 0.2);
+    display: none; 
+    flex-direction: column;
+    gap: 20px;
+    z-index: 10;
+
+    /* Posicionamiento flotante perfecto en el centro */
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.sub-menu-container.visible {
+    display: flex;
+    animation: fadeUp 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+.sub-menu-container.hidden {
+    display: none;
+}
+
+.sub-menu-title {
+    font-family: 'Cinzel', serif;
+    color: #e8d08b;
+    letter-spacing: 3px;
+    font-size: 1.3rem;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+    margin-bottom: 5px;
+}
+
+.sub-menu-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 45vh; 
+    overflow-y: auto; 
+    padding-right: 5px;
+}
+
+/* Scrollbar dorada */
+.sub-menu-grid::-webkit-scrollbar {
+    width: 5px;
+}
+.sub-menu-grid::-webkit-scrollbar-thumb {
+    background: #d4af37;
+    border-radius: 4px;
+}
+.sub-menu-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.sub-menu-item {
+    display: block;
+    text-decoration: none;
+    color: #fff;
+    font-family: 'Marcellus', serif;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 4px;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.sub-menu-item:hover {
+    background: rgba(212, 175, 55, 0.25);
+    border-color: #d4af37;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+}
+
+.close-sub-menu {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    margin-top: 5px;
+    transition: color 0.3s;
+}
+
+.close-sub-menu:hover {
+    color: #d4af37;
+}
+
+/* --- ANIMACIONES BÁSICAS --- */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -45%) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+/* --- DISEÑO RESPONSIVO --- */
+@media (max-width: 1024px) {
+    .main-title { font-size: 3.5rem; }
+    .menu-layout { padding: 0 20px; }
+    .menu-column { width: 280px; }
+}
+
+@media (max-width: 768px) {
+    body, html { overflow-y: auto; }
+    .menu-layout {
+        flex-direction: column;
+        justify-content: center;
+        gap: 30px;
+        margin-top: 30px;
+    }
+    .main-title { font-size: 2.5rem; }
+    .menu-column {
+        width: 100%;
+        max-width: 320px;
+        align-items: center;
+    }
+    .menu-btn { width: 100%; }
+    
+    .sub-menu-container {
+        width: 90%;
+        max-width: 340px;
+        position: fixed;
+    }
+}

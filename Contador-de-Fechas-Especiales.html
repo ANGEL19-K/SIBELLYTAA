@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>💖 Contador de Fechas Especiales 💫</title>
+<style>
+  *{box-sizing:border-box}
+  body{
+    margin:0;height:100vh;font-family:"Poppins",sans-serif;
+    background:radial-gradient(circle at top,#18042b,#0a0115);
+    display:flex;justify-content:center;align-items:center;color:#fff;
+  }
+  .card{
+    background:rgba(255,255,255,0.08);
+    border-radius:20px;padding:30px;width:360px;text-align:center;
+    box-shadow:0 0 20px rgba(255,192,203,0.3);backdrop-filter:blur(10px);
+  }
+  h2{margin-bottom:15px;color:#ffb8e2;font-size:22px}
+  label{display:block;margin-top:12px;color:#ffc8dd;font-weight:600;text-align:left}
+  input{
+    width:100%;padding:10px;margin-top:8px;border-radius:10px;border:none;
+    background:rgba(255,255,255,0.1);color:#fff;font-size:15px;outline:none;
+  }
+  input::placeholder{color:rgba(255,255,255,0.6)}
+  input[type="file"]{padding:8px}
+  button{
+    margin-top:18px;padding:10px 20px;border:none;border-radius:10px;
+    cursor:pointer;font-weight:600;font-size:15px;transition:.2s;
+  }
+  #applyBtn{
+    background:linear-gradient(90deg,#ff4dc4,#ff9edf,#ffd6e0);
+    color:#fff;box-shadow:0 0 10px #ff9edf;
+  }
+  #resetBtn{background:rgba(255,255,255,0.1);color:#fff;margin-left:8px}
+  #downloadBtn{
+    background:linear-gradient(90deg,#ff85c1,#ffbad5);
+    color:#fff;margin-top:10px;width:100%;
+  }
+
+  /* Vista previa */
+  .counterBox{
+    margin-top:25px;border-radius:15px;position:relative;overflow:hidden;min-height:340px;
+  }
+  .counterBg{
+    position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;
+    filter:brightness(.6) blur(2px);
+    opacity:0;transition:opacity .8s ease;
+  }
+  .fwCanvas{position:absolute;inset:0;z-index:1;pointer-events:none;display:none}
+  .counterContent{
+    position:relative;z-index:2;padding:16px 16px 20px;
+    display:flex;flex-direction:column;align-items:center;gap:12px;
+  }
+
+  /* Reloj analógico neón (preview) */
+  .clockPreview{
+    width:170px;height:170px;border-radius:50%;
+    border:6px solid rgba(255,255,255,0.2);
+    box-shadow:0 0 20px #ff80e7 inset,0 0 30px #00ffff55;
+    background:radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.0) 60%);
+
+    position:relative;opacity:0;transition:opacity .6s ease;
+    display:none;
+  }
+  .hand{
+    position:absolute;top:50%;left:50%;
+    transform-origin:50% 100%;
+    transform:translate(-50%,-100%) rotate(0deg);
+    border-radius:3px;
+  }
+  .hand.hour{width:6px;height:52px;background:#ff66c4;box-shadow:0 0 10px #ff66c4}
+  .hand.minute{width:4px;height:72px;background:#80eaff;box-shadow:0 0 10px #80eaff}
+  .hand.second{width:2px;height:78px;background:#f8ff80;box-shadow:0 0 8px #f8ff80}
+  .center-dot{
+    position:absolute;width:12px;height:12px;border-radius:50%;
+    background:#fff;top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:0 0 8px #fff
+  }
+
+  .counterContent h3 {
+  font-size: 28px; /* antes 19px */
+  color: #ffb3ef;
+  margin: 0;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  display: none;
+  text-shadow: 0 0 12px #ff80e7; /* toque neón opcional */
+}
+
+  .timer{
+    display:grid;grid-template-columns:repeat(2,minmax(120px,1fr));gap:10px;margin-top:6px;
+    width:100%;
+  }
+  .timer div{
+    background:rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;
+    text-align:center;backdrop-filter:blur(4px);
+  }
+  .timer span{display:block;font-size:24px;font-weight:800}
+  .timer small{font-size:13px;color:#ffc8dd}
+
+  /* Clases de aparición suave */
+  .visible{display:block !important}
+  .fadeIn{opacity:1 !important}
+
+  @media (max-width:400px){
+    .card{width:90%;padding:20px}
+    .timer{grid-template-columns:repeat(2,minmax(100px,1fr))}
+  }
+</style>
+</head>
+<body>
+
+<div class="card" id="counterCard">
+  <h2>💖 Contador de Fechas Especiales 💫</h2>
+
+  <label for="titleInput">Título</label>
+  <input type="text" id="titleInput" placeholder="Ej: Mi aniversario 💕">
+
+  <label for="dateInput">📅 Fecha del evento</label>
+  <input type="date" id="dateInput">
+
+  <label for="photoInput">📸 Subir una foto (opcional)</label>
+  <input type="file" id="photoInput" accept="image/*">
+
+  <div>
+    <button id="applyBtn">Vista Previa</button>
+    <button id="resetBtn">Reiniciar</button>
+  </div>
+
+  <!-- Vista previa -->
+  <div class="counterBox" id="counterBox">
+    <img id="previewImg" class="counterBg" alt="">
+    <canvas id="fwPrev" class="fwCanvas"></canvas>
+
+    <div class="counterContent">
+      <!-- Reloj arriba, aparece al aplicar -->
+      <div class="clockPreview" id="clockPrev" aria-hidden="true">
+        <div class="hand hour" id="pHour"></div>
+        <div class="hand minute" id="pMinute"></div>
+        <div class="hand second" id="pSecond"></div>
+        <div class="center-dot"></div>
+      </div>
+
+      <!-- Título aparece al aplicar -->
+      <h3 id="counterTitle">💕 Tu contador aparecerá aquí</h3>
+
+      <!-- Los cuadros del contador SIEMPRE visibles -->
+      <div class="timer">
+        <div><span id="days">--</span><small>DÍAS</small></div>
+        <div><span id="hours">--</span><small>HORAS</small></div>
+        <div><span id="minutes">--</span><small>MIN</small></div>
+        <div><span id="seconds">--</span><small>SEG</small></div>
+      </div>
+    </div>
+  </div>
+
+  <button id="downloadBtn">📥 Obtener HTML</button>
+</div>
+
+<script>
+/* ======================
+   REFERENCIAS & ESTADO
+====================== */
+let countdown, imgBase64="", fwAnimId=null, fwIntervalId=null;
+const dateInput=document.getElementById("dateInput");
+const titleInput=document.getElementById("titleInput");
+const photoInput=document.getElementById("photoInput");
+const previewImg=document.getElementById("previewImg");
+const counterTitle=document.getElementById("counterTitle");
+
+// 🔒 Evitar fechas pasadas
+const today = new Date().toISOString().split("T")[0];dateInput.setAttribute("min", today);
+
+const days=document.getElementById("days");
+const hours=document.getElementById("hours");
+const minutes=document.getElementById("minutes");
+const seconds=document.getElementById("seconds");
+const fwCanvas=document.getElementById("fwPrev");
+const fwCtx=fwCanvas.getContext("2d");
+const counterBox=document.getElementById("counterBox");
+const clockPrev=document.getElementById("clockPrev");
+const pHour=document.getElementById("pHour");
+const pMinute=document.getElementById("pMinute");
+const pSecond=document.getElementById("pSecond");
+
+/* ======================
+   IMAGEN: guardamos base64 pero NO mostramos hasta Aplicar
+====================== */
+photoInput.addEventListener("change",(e)=>{
+  const file=e.target.files[0];
+  if(file){
+    const reader=new FileReader();
+    reader.onload=()=>{ imgBase64=reader.result; };
+    reader.readAsDataURL(file);
+  }else{
+    imgBase64="";
+  }
+});
+
+/* ======================
+   RELOJ ANALÓGICO PREVIEW (zona local)
+====================== */
+function updatePreviewClock(){
+  const now=new Date(); // local
+  const h=now.getHours()%12, m=now.getMinutes(), s=now.getSeconds();
+  pHour.style.transform  = `translate(-50%,-100%) rotate(${h*30 + m*0.5}deg)`;
+  pMinute.style.transform= `translate(-50%,-100%) rotate(${m*6}deg)`;
+  pSecond.style.transform= `translate(-50%,-100%) rotate(${s*6}deg)`;
+}
+let clockTick=setInterval(updatePreviewClock,1000); updatePreviewClock();
+
+/* ======================
+   CONTADOR PREVIEW (local)
+====================== */
+function startPreviewCountdown(){
+  const value=dateInput.value;
+  if(!value){ alert("Selecciona una fecha válida 💖"); return false; }
+  let targetDate = new Date(value + "T00:00:00"); // local
+
+// 🔁 Si la fecha seleccionada es hoy, que empiece el conteo para mañana
+const now = new Date();
+const todayStr = now.toISOString().split("T")[0];
+if (value === todayStr) {
+  targetDate.setDate(targetDate.getDate() + 1);
+}
+
+  if(isNaN(targetDate)){ alert("Fecha inválida 💖"); return false; }
+
+  clearInterval(countdown);
+  countdown=setInterval(()=>{
+    const now=new Date();
+    const diff=targetDate-now;
+    if(diff<=0){
+      clearInterval(countdown);
+      days.textContent=hours.textContent=minutes.textContent=seconds.textContent="00";
+      return;
+    }
+    const d=Math.floor(diff/(1000*60*60*24));
+    const h=Math.floor((diff/(1000*60*60))%24);
+    const m=Math.floor((diff/(1000*60))%60);
+    const s=Math.floor((diff/1000)%60);
+    days.textContent=d; hours.textContent=h; minutes.textContent=m; seconds.textContent=s;
+  },1000);
+  return true;
+}
+
+/* ======================
+   FUEGOS ARTIFICIALES PREVIEW
+====================== */
+let fwParticles=[];
+function fwSize(){
+  const r=counterBox.getBoundingClientRect();
+  fwCanvas.width=r.width; fwCanvas.height=r.height;
+}
+function fwRandom(a,b){return Math.random()*(b-a)+a;}
+class FWParticle{
+  constructor(x,y,color){
+    this.x=x; this.y=y; this.color=color;
+    this.vx=fwRandom(-3,3); this.vy=fwRandom(-3,3);
+    this.alpha=1;
+  }
+  update(){ this.x+=this.vx; this.y+=this.vy; this.vy+=0.03; this.alpha-=0.015; }
+  draw(){
+    fwCtx.globalAlpha=this.alpha;
+    fwCtx.fillStyle=this.color;
+    fwCtx.beginPath(); fwCtx.arc(this.x,this.y,2,0,Math.PI*2); fwCtx.fill();
+  }
+}
+function fwBurst(){
+  const x=fwRandom(fwCanvas.width*0.15, fwCanvas.width*0.85);
+  const y=fwRandom(fwCanvas.height*0.05, fwCanvas.height*0.4);
+  const c=`hsl(${fwRandom(0,360)},100%,60%)`;
+  for(let i=0;i<80;i++) fwParticles.push(new FWParticle(x,y,c));
+}
+function fwLoop(){
+  fwCtx.clearRect(0,0,fwCanvas.width,fwCanvas.height);
+  for(let i=fwParticles.length-1;i>=0;i--){
+    const p=fwParticles[i]; p.update(); p.draw();
+    if(p.alpha<=0) fwParticles.splice(i,1);
+  }
+  fwAnimId=requestAnimationFrame(fwLoop);
+}
+function startFireworks(){
+  fwSize();
+  window.addEventListener("resize", fwSize);
+  fwCanvas.classList.add("visible"); // display:block
+  fwParticles=[];
+  if(fwAnimId) cancelAnimationFrame(fwAnimId);
+  fwLoop();
+  if(fwIntervalId) clearInterval(fwIntervalId);
+  fwIntervalId=setInterval(fwBurst, 500); // velocidad/flujo
+  fwBurst();
+}
+function stopFireworks(){
+  if(fwAnimId) cancelAnimationFrame(fwAnimId);
+  if(fwIntervalId) clearInterval(fwIntervalId);
+  window.removeEventListener("resize", fwSize);
+  fwCanvas.classList.remove("visible");
+  fwParticles=[];
+}
+
+/* ======================
+   APLICAR: aparece todo con fade-in
+====================== */
+document.getElementById("applyBtn").addEventListener("click",()=>{
+  // Fondo (si hay imagen)
+  if(imgBase64){
+    previewImg.src=imgBase64;
+    requestAnimationFrame(()=> previewImg.classList.add("fadeIn"));
+  }else{
+    previewImg.classList.remove("fadeIn");
+    previewImg.removeAttribute("src");
+  }
+
+  // Título
+  counterTitle.textContent = (titleInput.value || "💖 Contador activo");
+  counterTitle.classList.add("visible");
+  requestAnimationFrame(()=> counterTitle.classList.add("fadeIn"));
+
+  // Reloj
+  clockPrev.classList.add("visible");
+  requestAnimationFrame(()=> clockPrev.classList.add("fadeIn"));
+
+  // Contador + fuegos
+  if(startPreviewCountdown()) startFireworks();
+});
+
+/* ======================
+   RESET
+====================== */
+/* ======================
+   RESET COMPLETO (volver al estado inicial)
+====================== */
+document.getElementById("resetBtn").addEventListener("click",()=>{
+  // Detener todos los intervalos y animaciones
+  clearInterval(countdown);
+  if (fwAnimId) cancelAnimationFrame(fwAnimId);
+  if (fwIntervalId) clearInterval(fwIntervalId);
+
+  // Vaciar campos del formulario
+  dateInput.value = "";
+  titleInput.value = "";
+  photoInput.value = "";
+  imgBase64 = "";
+
+  // Reiniciar vista previa
+  previewImg.classList.remove("fadeIn");
+  previewImg.removeAttribute("src");
+  previewImg.style.opacity = "0";
+
+  // Ocultar reloj y título
+  clockPrev.classList.remove("fadeIn", "visible");
+  counterTitle.textContent = "💕 Tu contador aparecerá aquí";
+  counterTitle.classList.remove("fadeIn", "visible");
+
+  // Reiniciar valores del contador
+  [days, hours, minutes, seconds].forEach(e => e.textContent = "--");
+
+  // Detener y limpiar fuegos artificiales
+  stopFireworks();
+  fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+  fwCanvas.classList.remove("visible");
+
+  // Restaurar animación del reloj pero invisible (para no romper el loop base)
+  updatePreviewClock();
+
+  // Quitar cualquier blur/filtro residual
+  counterBox.scrollIntoView({ behavior: "smooth", block: "center" });
+});
+
+
+/* ======================
+   DESCARGAR HTML FINAL
+====================== */
+document.getElementById("downloadBtn").addEventListener("click",()=>{
+  const titleValue=titleInput.value||"Contador Especial";
+  const dateValue=dateInput.value||"";
+
+  const htmlContent=`<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${titleValue}</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Poppins',sans-serif;color:#fff;background:#000;overflow:hidden}
+  #bg{position:fixed;inset:0;background:${imgBase64?`url('${imgBase64}') center/cover no-repeat`:'#000'};
+      filter:brightness(.6) blur(2px);z-index:0}
+  #fireworks{position:fixed;inset:0;z-index:1;pointer-events:none}
+  .container{
+    position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:20px;padding:16px;text-align:center
+  }
+  
+  .clock{
+  width:200px;
+  height:200px;
+  border:6px solid rgba(255,255,255,0.2);
+  border-radius:50%;
+  margin:25px auto;
+  position:relative;
+  background:radial-gradient(circle at center, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.0) 70%);
+  box-shadow:0 0 35px #ff80e7, inset 0 0 25px #7df9ff;
+  overflow:hidden;
+}
+
+.hand{
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:2px;
+  transform-origin:50% 100%;
+  transform:translate(-50%,-100%) rotate(0deg);
+  border-radius:2px;
+}
+.hand.hour{height:45px;background:#ff66cc;box-shadow:0 0 8px #ff66cc;}
+.hand.minute{height:65px;background:#66ccff;box-shadow:0 0 8px #66ccff;}
+.hand.second{height:80px;background:#ffff66;box-shadow:0 0 8px #ffff66;}
+.centerDot{
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:12px;
+  height:12px;
+  background:#fff;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  box-shadow:0 0 10px #fff;
+}
+
+
+  h1{
+  color:#ffb3ef;
+  text-shadow:0 0 35px #ff80e7, 0 0 70px #ff4dc4;
+  margin:0 0 12px 0;
+  font-size:clamp(38px,8vw,68px); /* 👈 más grande y adaptable */
+  font-weight:900;
+  letter-spacing:1.2px;
+  text-transform:uppercase;
+}
+
+
+
+  /* Contador 2x2 grande y responsive */
+  .timer{
+    display:grid;grid-template-columns:repeat(2,minmax(140px,1fr));gap:14px;
+    width:min(90vw,420px);
+  }
+  .tile{
+    background:rgba(0,0,0,0.45);padding:18px 16px;border-radius:14px;
+    backdrop-filter:blur(4px);box-shadow:0 0 18px rgba(255,128,231,.2);
+  }
+  .tile span{display:block;font-size:clamp(36px,7vw,48px);font-weight:900;line-height:1}
+  .tile small{display:block;margin-top:6px;color:#ffc8dd;font-size:clamp(12px,2.8vw,14px);letter-spacing:.6px}
+
+  @media(max-width:420px){
+    .timer{gap:10px}
+    .tile{padding:16px 12px}
+  }
+</style>
+<div id="bg"></div>
+<canvas id="fireworks"></canvas>
+
+<div class="container">
+  <div class="clock">
+    <div class="hand hour" id="hour"></div>
+    <div class="hand minute" id="minute"></div>
+    <div class="hand second" id="second"></div>
+    <div class="center-dot"></div>
+  </div>
+
+  <h1>${titleValue}</h1>
+
+  <div class="timer">
+    <div class="tile"><span id="d">--</span><small>DÍAS</small></div>
+    <div class="tile"><span id="h">--</span><small>HORAS</small></div>
+    <div class="tile"><span id="m">--</span><small>MIN</small></div>
+    <div class="tile"><span id="s">--</span><small>SEG</small></div>
+  </div>
+</div>
+
+<script>
+  // Reloj (zona local)
+  function uClock(){
+    const n=new Date(); const h=n.getHours()%12, m=n.getMinutes(), s=n.getSeconds();
+    document.getElementById("hour").style.transform="translate(-50%,-100%) rotate("+(h*30+m*0.5)+"deg)";
+    document.getElementById("minute").style.transform="translate(-50%,-100%) rotate("+(m*6)+"deg)";
+    document.getElementById("second").style.transform="translate(-50%,-100%) rotate("+(s*6)+"deg)";
+  }
+  setInterval(uClock,1000); uClock();
+
+  // Contador (zona local)
+  let tgt = new Date("${dateValue?dateValue:""}T00:00:00");
+
+// 🔁 Si la fecha elegida es hoy, contar hacia mañana
+const now = new Date();
+const todayStr = now.toISOString().split("T")[0];
+if ("${dateValue}" === todayStr) {
+  tgt.setDate(tgt.getDate() + 1);
+}
+
+  function tick(){
+    const now=new Date(); const diff=tgt-now; if(isNaN(tgt)) return;
+    const d=Math.max(0,Math.floor(diff/(1000*60*60*24)));
+    const h=Math.max(0,Math.floor((diff/(1000*60*60))%24));
+    const m=Math.max(0,Math.floor((diff/(1000*60))%60));
+    const s=Math.max(0,Math.floor((diff/1000)%60));
+    document.getElementById("d").textContent=d;
+    document.getElementById("h").textContent=h;
+    document.getElementById("m").textContent=m;
+    document.getElementById("s").textContent=s; 
+  }
+  setInterval(tick,1000); tick();
+
+  // Fuegos detrás del contenido
+  const c=document.getElementById("fireworks"),x=c.getContext("2d");
+  function rs(){c.width=innerWidth;c.height=innerHeight} rs(); addEventListener('resize',rs);
+  const P=[];
+  class Pt{constructor(X,Y,C){this.x=X;this.y=Y;this.c=C;this.vx=(Math.random()*6-3);this.vy=(Math.random()*6-3);this.a=1}
+    u(){this.x+=this.vx;this.y+=this.vy;this.vy+=.03;this.a-=.015}
+    d(){x.globalAlpha=this.a;x.fillStyle=this.c;x.beginPath();x.arc(this.x,this.y,2,0,6.283);x.fill()}
+  }
+  function burst(){const X=Math.random()*c.width,Y=Math.random()*c.height*.5,C=\`hsl(\${Math.random()*360},100%,60%)\`;for(let i=0;i<120;i++)P.push(new Pt(X,Y,C))}
+  function loop(){x.clearRect(0,0,c.width,c.height);for(let i=P.length-1;i>=0;i--){const p=P[i];p.u();p.d();if(p.a<=0)P.splice(i,1)}requestAnimationFrame(loop)}
+  setInterval(burst,350); burst(); loop();
+<\/script>
+</html>`;
+
+  const blob=new Blob([htmlContent],{type:"text/html"});
+  const link=document.createElement("a");
+  link.href=URL.createObjectURL(blob);
+  link.download=`${(titleValue||"contador").replace(/\s+/g,"_")}.html`;
+  link.click();
+  setTimeout(()=>URL.revokeObjectURL(link.href),5000);
+});
+</script>
+</body>
+</html>

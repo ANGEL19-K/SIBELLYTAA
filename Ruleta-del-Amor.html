@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>💖 Ruleta del Amor</title>
+<style>
+html,body{
+  margin:0;padding:0;
+  width:100%;height:100%;
+  overflow:hidden;
+  background:#000;
+  font-family:'Poppins',sans-serif;
+}
+#escenas{
+  position:relative;
+  width:100%;height:100%;
+  display:flex;justify-content:center;align-items:center;
+}
+iframe{
+  position:absolute;
+  top:0;left:0;
+  width:100%;height:100%;
+  border:none;
+  transition:opacity 1.6s ease;
+  opacity:0;
+  pointer-events:none;
+}
+#ruletaFrame{opacity:1;pointer-events:all;z-index:2;}
+#floresFrame{z-index:1;}
+.show{opacity:1!important;pointer-events:all!important;}
+.hide{opacity:0!important;pointer-events:none!important;}
+
+/* --- Ajustes responsive --- */
+@media (max-width:768px){
+  iframe{
+    transform:scale(1);
+  }
+}
+@media (orientation:landscape) and (max-height:500px){
+  iframe{
+    height:100vh;
+  }
+}
+</style>
+</head>
+<body>
+<div id="escenas">
+  <iframe id="ruletaFrame"></iframe>
+  <iframe id="floresFrame"></iframe>
+</div>
+
+<!-- 🔹 PLANTILLA RULETA -->
+<template id="ruletaHTML">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>¿Quieres ser mi novia? 💞</title>
+<style>
+:root { --size: 460px }
+
+/* ===== FONDO ===== */
+body{
+  margin:0; height:100vh;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  background:radial-gradient(circle at top, #fff1fc 0%, #ffe4f8 50%, #fbefff 100%);
+  font-family:'Poppins',sans-serif; text-align:center; overflow:hidden; gap:12px;
+  transition:background 1.5s ease;
+}
+body.spinBg{
+  background:radial-gradient(circle at center, #ffeaf7 0%, #ffcbe8 45%, #fff0fa 100%);
+}
+
+/* ===== ✨ EFECTOS DE APARICIÓN MÁGICA ===== */
+@keyframes fadeGlow {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+    filter: blur(8px);
+    text-shadow: 0 0 0 rgba(255,160,210,0);
+  }
+  40% {
+    opacity: 0.6;
+    transform: translateY(10px) scale(1.03);
+    filter: blur(3px);
+    text-shadow: 0 0 10px rgba(255,160,210,0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+    text-shadow: 0 0 14px rgba(255,182,193,0.6), 0 0 24px rgba(255,160,210,0.5);
+  }
+}
+
+h1, .subtitle, button {
+  opacity: 0;
+  animation: fadeGlow 1.8s ease forwards;
+}
+
+h1 {
+  margin-bottom: -10%;
+  animation-delay: 0.3s;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #000;
+  text-shadow: 0 0 10px rgba(255,160,210,0.5);
+}
+
+.subtitle {
+  animation-delay: 0.8s;
+  font-size: 1.15rem;
+  color: #555;
+  min-height: 60px;
+  Margin-top: 70px;
+  text-shadow: 0 0 8px rgba(255,180,210,0.4);
+}
+
+/* 💞 Botón con efecto de aparición y halo */
+@keyframes fadeButton {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(30px);
+    filter: blur(6px);
+    box-shadow: 0 0 0 rgba(255,150,200,0);
+  }
+  60% {
+    opacity: 0.7;
+    transform: scale(1.05) translateY(-6px);
+    box-shadow: 0 0 16px rgba(255,160,210,0.6);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(255,182,193,0.5);
+  }
+}
+
+button {
+  animation: fadeButton 2s cubic-bezier(0.25, 1, 0.3, 1) forwards;
+  animation-delay: 1.5s;
+}
+
+/* ===== 💫 EFECTOS DE TRANSICIÓN DE FRASES Y BOTONES ===== */
+@keyframes fadeSoftText {
+  0% {
+    opacity: 0;
+    transform: translateY(25px) scale(0.95);
+    filter: blur(6px);
+    text-shadow: 0 0 0 rgba(255,160,210,0);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translateY(6px) scale(1.03);
+    filter: blur(2px);
+    text-shadow: 0 0 12px rgba(255,160,210,0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+    text-shadow: 0 0 14px rgba(255,182,193,0.6);
+  }
+}
+
+@keyframes fadeSoftBtn {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(20px);
+    filter: blur(5px);
+  }
+  60% {
+    opacity: 0.8;
+    transform: scale(1.05) translateY(-6px);
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* 🌸 Cuando los mensajes cambian dinámicamente */
+.subtitle.showing {
+  animation: fadeSoftText 2s ease forwards;
+  opacity: 1 !important;
+  animation-fill-mode: forwards;
+}
+
+
+/* 💞 Cuando el botón cambia (ej: Girar otra vez / Abrir regalo) */
+button.showing {
+  animation: fadeSoftBtn 1.8s ease forwards;
+}
+
+
+
+/* ===== RULETA ===== */
+/* Aplica a la ruleta (contenedor del canvas) */
+/* 🎡 Ruleta con animación de entrada + zoom funcional */
+.stage {
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+  margin: 10px 0 44px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  animation: stageAppear 1.5s ease forwards;
+}
+
+/* 🌸 Animación de entrada */
+@keyframes stageAppear {
+  0% { opacity: 0; transform: scale(0.6) rotate(-20deg); filter: blur(10px); }
+  60% { opacity: 1; transform: scale(1.1) rotate(10deg); filter: blur(3px); }
+  100% { opacity: 1; transform: scale(1) rotate(0); filter: blur(0); }
+}
+
+/* 🎀 Capa interna que se expande al girar */
+.wheel-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  transition: transform 1.2s ease, filter 1.2s ease;
+}
+
+/* 💫 Zoom y brillo al girar */
+.wheel-container.spinZoom {
+  transform: scale(1.18);
+  filter: drop-shadow(0 0 40px rgba(255,182,193,0.9))
+          drop-shadow(0 0 80px rgba(255,105,180,0.8));
+}
+
+/* 💞 Zoom mientras gira */
+.stage.spinZoom {
+  transform: scale(1.18);
+  filter: drop-shadow(0 0 35px rgba(255, 182, 193, 0.8))
+          drop-shadow(0 0 70px rgba(255, 105, 180, 0.7));
+}
+
+/* ✨ Animación de entrada suave */
+@keyframes wheelAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotate(-20deg);
+    filter: blur(10px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.1) rotate(10deg);
+    filter: blur(3px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+    filter: blur(0);
+  }
+}
+
+
+.stage::before {
+  content: "";
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,182,193,0.5) 0%, transparent 70%);
+  opacity: 0;
+  animation: haloAppear 2.3s ease forwards;
+}
+
+@keyframes haloAppear {
+  0% { opacity: 0; transform: scale(0.6); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+
+
+
+
+canvas{ width:100%; height:100%; border-radius:50%; display:block; }
+
+/* ✨ Halo rosado brillante al girar */
+.stage.spinZoom{
+  transform:scale(1.15);
+  filter: drop-shadow(0 0 40px rgba(255,150,210,0.85))
+          drop-shadow(0 0 70px rgba(255,180,220,0.75))
+          drop-shadow(0 0 90px rgba(255,190,230,0.5));
+}
+
+/* ❤️ Corazón central */
+.center-heart{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) scale(0.9);
+  width:92px; height:92px; border-radius:50%; background:#fff; border:6px solid #fff;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 2px 10px rgba(0,0,0,0.18); z-index:5;
+  animation:beat 1.8s ease-in-out infinite alternate;
+}
+@keyframes beat{
+  0%{transform:translate(-50%,-50%) scale(0.9);}
+  100%{transform:translate(-50%,-50%) scale(1);}
+}
+.center-heart span{font-size:42px;}
+
+/* 📍 Puntero */
+#pointer{
+  position:absolute; top:-15px; left:50%; transform:translateX(-50%);
+  width:32px; height:42px;
+  background:linear-gradient(180deg,#66ccff,#0044ff);
+  border-radius:50% 50% 50% 50%/60% 60% 40% 40%;
+  clip-path:polygon(50% 100%, 0 40%, 50% 0, 100% 40%);
+  box-shadow:0 0 10px rgba(102,204,255,0.8),0 0 25px rgba(0,100,255,0.6);
+  z-index:10;
+}
+
+
+#pointer::after{
+  content:''; position:absolute; top:12px; left:50%; transform:translateX(-50%);
+  width:10px; height:10px; background:#fff; border-radius:50%;
+}
+@keyframes tick{
+  0%{transform:translateX(-50%) rotate(0deg)}
+  50%{transform:translateX(-50%) rotate(-8deg)}
+  100%{transform:translateX(-50%) rotate(0deg)}
+}
+
+/* 🎀 Botón base */
+button {
+  margin-top: 8px;
+  margin-bottom: 20px;
+  padding: 14px 34px;
+  border: none;
+  border-radius: 999px;
+  background: #000;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transform-origin: center center;
+}
+
+/* ✨ Hover normal */
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 14px rgba(255, 170, 210, 0.5);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 💖 Sector “Sí” resplandeciente */
+@keyframes glowSector {
+  from { filter: drop-shadow(0 0 5px #ff8bc6) drop-shadow(0 0 15px #ffb2d8); }
+  to   { filter: drop-shadow(0 0 25px #ff9fd4) drop-shadow(0 0 40px #ffc1e0); }
+}
+
+/* 📱 Móvil */
+@media(max-width:480px){
+  :root{--size:360px}
+  h1{font-size:2rem;}
+  .center-heart{width:76px;height:76px;border-width:5px;}
+  .center-heart span{font-size:34px;}
+}
+
+
+/* 💕 Corazones flotando */
+.heart {
+  position: fixed;
+  bottom: -20px;
+  color: #ff7abf;
+  font-size: 24px;
+  opacity: 0.8;
+  animation: floatHearts 5s ease-in infinite;
+  pointer-events: none;
+  z-index: 999;
+}
+
+/* 💞 Corazones que flotan hasta arriba y desaparecen suavemente */
+@keyframes floatHearts {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.9;
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-40vh) scale(1.3) rotate(10deg);
+  }
+  60% {
+    transform: translateY(-80vh) scale(1.1) rotate(-6deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(-110vh) scale(0.8) rotate(0deg);
+    opacity: 0;
+  }
+}
+
+
+/* 💝 Efecto de latido del botón “Abrir regalo” */
+@keyframes pulseGift {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+    box-shadow:
+      0 0 10px rgba(255, 160, 210, 0.5),
+      0 0 20px rgba(255, 160, 210, 0.4);
+  }
+  25% {
+    transform: scale(1.12);
+    filter: brightness(1.15);
+    box-shadow:
+      0 0 25px rgba(255, 150, 210, 0.8),
+      0 0 45px rgba(255, 180, 230, 0.6);
+  }
+  50% {
+    transform: scale(0.96);
+    filter: brightness(0.95);
+    box-shadow:
+      0 0 15px rgba(255, 130, 200, 0.6),
+      0 0 30px rgba(255, 150, 210, 0.5);
+  }
+  75% {
+    transform: scale(1.18);
+    filter: brightness(1.25);
+    box-shadow:
+      0 0 40px rgba(255, 180, 230, 0.9),
+      0 0 70px rgba(255, 190, 240, 0.8);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+    box-shadow:
+      0 0 10px rgba(255, 160, 210, 0.5),
+      0 0 20px rgba(255, 160, 210, 0.4);
+  }
+}
+
+button.giftPulse {
+  opacity: 1 !important;
+  visibility: visible !important;
+  animation: pulseGift 1.6s ease-in-out infinite !important;
+  background: linear-gradient(145deg, #ff6fae, #ffb4d2);
+  color: #fff;
+  border: none;
+  text-shadow: 0 0 6px rgba(255,255,255,0.8);
+  transform-origin: center;
+  transition: none !important;
+  pointer-events: auto;
+  z-index: 10;
+}
+
+
+
+
+
+</style>
+</head>
+<body>
+<h1>¿Quieres ser mi novia? 💞</h1>
+<div class="subtitle" id="phaseText">✨ Gira la ruleta y deja que el destino decida...</div>
+
+<div class="stage" id="stage">
+  <div class="wheel-container" id="wheelContainer">
+    <canvas id="wheel" width="460" height="460"></canvas>
+    <div id="pointer"></div>
+    <div class="center-heart"><span>💖</span></div>
+  </div>
+</div>
+
+<button id="spinBtn">💘 Girar ✨</button>
+
+<script>
+(() => {
+  const canvas = document.getElementById('wheel');
+  const ctx = canvas.getContext('2d');
+ 
+
+
+  const btn = document.getElementById('spinBtn');
+  const phaseText = document.getElementById('phaseText');
+
+  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2;
+  const R=195,R_OUT=R+10,R_TEXT=R*0.72,R_DOT=R_OUT-3;
+  const options=["No 💔","No 💔","No 💔","Sí 💖","No 💔","No 💔","No 💔","No 💔"];
+  const N=options.length,TWO_PI=Math.PI*2,seg=TWO_PI/N;
+  const colors=["#ff7675","#fab1a0","#74b9ff","#ffeaa7","#a29bfe","#55efc4","#fd79a8","#81ecec"];
+  let rotation = -Math.PI / 16, spinning = false, roundCount = 0;
+
+
+  const norm=a=>{a%=TWO_PI;return a<0?a+TWO_PI:a;};
+  const easeOut=t=>1-Math.pow(1-t,3);
+  
+   const stage = document.getElementById('stage');
+stage.addEventListener("animationend", () => {
+  stage.style.animation = "none"; // detiene la animación de entrada
+  stage.style.opacity = "1";      // asegura que no desaparezca
+  stage.style.transform = "scale(1)"; // resetea correctamente
+});
+
+
+// 💖 Función para crear corazones flotantes
+function createHeart() {
+  const heart = document.createElement("div");
+  heart.className = "heart";
+  heart.textContent = "💖";
+
+  // Posición y tamaño aleatorios
+  heart.style.left = Math.random() * 100 + "vw";
+  heart.style.fontSize = 20 + Math.random() * 24 + "px";
+
+  document.body.appendChild(heart);
+  setTimeout(() => heart.remove(), 5000); // se elimina después de 5s
+}
+
+// 💫 Texto con animación suave cada vez que cambia
+function softText(text) {
+  phaseText.classList.remove("showing");
+  phaseText.style.opacity = "0";       // oculta antes del cambio
+  void phaseText.offsetWidth;          // reinicia animación
+  phaseText.textContent = text;        // cambia el texto
+  phaseText.classList.add("showing");  // aplica animación
+}
+
+
+
+function showButton(label, pulse = false) {
+  btn.textContent = label;
+  btn.classList.remove("showing");
+  btn.style.opacity = "0";
+  void btn.offsetWidth;
+  btn.classList.add("showing");
+  if (pulse) btn.style.animation += ", pulseGift 1.8s infinite ease-in-out";
+}
+
+  function draw(rot=0,highlight=null){
+    ctx.clearRect(0,0,W,H);
+    for(let i=0;i<N;i++){
+      const a0=i*seg+rot,a1=a0+seg;
+      ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,a0,a1);ctx.closePath();
+      ctx.fillStyle=colors[i%colors.length];ctx.fill();
+      ctx.lineWidth=3;ctx.strokeStyle="#fff";ctx.stroke();
+
+      const mid=(a0+a1)/2;
+      ctx.save();
+      ctx.translate(cx+Math.cos(mid)*R_TEXT,cy+Math.sin(mid)*R_TEXT);
+      ctx.rotate(mid+Math.PI/2);
+      ctx.fillStyle="#000";ctx.font="bold 19px Poppins";
+      ctx.textAlign="center";ctx.textBaseline="middle";
+      ctx.fillText(options[i],0,0);
+      ctx.restore();
+    }
+
+    if(highlight!==null){
+      const a0=highlight*seg+rot,a1=a0+seg;
+      ctx.save();
+      ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R-2,a0,a1);ctx.closePath();
+      ctx.strokeStyle="#ff88c2";ctx.lineWidth=10;
+      ctx.shadowColor="#ffb6da";ctx.shadowBlur=25;ctx.stroke();
+      ctx.restore();
+    }
+
+    ctx.beginPath();ctx.arc(cx,cy,R_OUT,0,TWO_PI);
+    ctx.lineWidth=6;ctx.strokeStyle="#fff";ctx.stroke();
+    for(let i=0;i<N;i++){
+      const a=(i+1)*seg+rot;
+      const px=cx+Math.cos(a)*R_DOT,py=cy+Math.sin(a)*R_DOT;
+      ctx.beginPath();ctx.arc(px,py,6,0,TWO_PI);
+      ctx.fillStyle="#000";ctx.fill();
+    }
+  }
+  draw(rotation);
+
+btn.addEventListener('click',()=>{
+  if(spinning)return;
+  spinning=true;
+  btn.disabled=true;
+
+  softText("💫 El destino está decidiendo...");
+
+  document.body.classList.add('spinBg');
+  const wheelContainer = document.getElementById('wheelContainer');
+  wheelContainer.classList.add('spinZoom');
+
+
+
+
+
+    const winIndex=options.findIndex(s=>s.toLowerCase().includes("sí")||s.toLowerCase().includes("si"));
+    const winCenter=winIndex*seg+seg/2;
+    let offset = (Math.random() - 2) * (Math.PI / 20);
+let delta = -Math.PI / 2 - (winCenter + rotation) + offset;
+
+    delta=norm(delta);
+    const extraTurns=Math.floor(4+Math.random()*5);
+    const target=rotation+extraTurns*TWO_PI+delta;
+    const start=performance.now(),duration=6000,startRot=rotation;
+    let lastStep=-1;
+
+    function frame(t){
+      const p=Math.min((t-start)/duration,1),e=easeOut(p);
+      rotation=startRot+(target-startRot)*e;draw(rotation);
+      const step=Math.floor(rotation/seg);
+      if(step!==lastStep){
+        const pointer=document.getElementById('pointer');
+        pointer.style.animation="none";void pointer.offsetWidth;
+        pointer.style.animation="tick 0.12s ease-out";
+        lastStep=step;
+      }
+      if(p<1)requestAnimationFrame(frame);
+      else{
+        rotation=target;draw(rotation,winIndex);
+        spinning=false;document.body.classList.remove('spinBg');
+          wheelContainer.classList.remove('spinZoom');
+        roundCount++;
+        if(roundCount===1){
+          softText("✨ Parece que el destino quiere que lo confirmes... gira otra vez 💞");
+
+          btn.textContent="💘 Girar otra vez ✨";
+        }else{
+          softText("💍 Está confirmado... el destino nos quiere juntos 💞");
+
+
+btn.textContent = "💝 Abrir regalo 💝";
+btn.style.opacity = "1";
+btn.style.visibility = "visible";
+btn.classList.remove("showing"); // por si estaba con animación previa
+void btn.offsetWidth; // reinicia animaciones
+btn.classList.add("giftPulse");
+
+
+
+          
+          
+for (let i = 0; i < 15; i++) {
+  setTimeout(createHeart, i * 300);
+}
+        }
+        btn.disabled=false;btn.style.animation="fadeGlow 1s ease forwards";
+      }
+    }
+    requestAnimationFrame(frame);
+  });
+})();
+</script>
+</body>
+</html>
+</template>
+
+<!-- 🔹 PLANTILLA FLORES -->
+<template id="floresHTML">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🌙 Flores mágicas bajo la luna</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  display:flex;align-items:flex-end;justify-content:center;
+  height:100vh;overflow:hidden;position:relative;
+  background:radial-gradient(circle at 50% 20%,#150028 0%,#000010 90%);
+  perspective:1000px;
+}
+
+/* 🌙 Luna */
+.moon{
+  position:absolute;top:10%;left:50%;transform:translateX(-50%);
+  width:160px;height:160px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#fff,#ccc 70%,#aaa0 100%);
+  box-shadow:0 0 80px 25px rgba(255,255,255,0.25);
+  animation:glow 5s ease-in-out infinite alternate, moonbeat 3s ease-in-out infinite;
+  z-index:0;
+}
+
+/* ✨ latido de la luna */
+@keyframes moonbeat{
+  0%,100%{transform:translateX(-50%) scale(1);}
+  50%{transform:translateX(-50%) scale(1.05);}
+}
+
+
+
+/* ✨ Estrellas */
+.star{
+  position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;
+  opacity:0.8;animation:twinkle 3s ease-in-out infinite;z-index:0;
+}
+@keyframes twinkle{0%,100%{opacity:.2}50%{opacity:1}}
+
+/* 🌠 Estrellas fugaces */
+.shooting-stars{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;z-index:1;
+}
+.shooting-star{
+  position:absolute;width:4px;height:4px;background:#fff;border-radius:50%;
+  box-shadow:0 0 6px 2px rgba(255,255,255,0.8);
+  opacity:0;animation:shoot 3s linear infinite;
+}
+.shooting-star::before{
+  content:'';position:absolute;top:50%;right:0;transform:translateY(-50%);
+  width:0;height:2px;
+  background:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,1) 100%);
+  animation:tail 3s linear infinite;
+}
+@keyframes shoot{
+  0%{opacity:0;transform:translateX(0)translateY(0)rotate(45deg);}
+  10%{opacity:1;}
+  90%{opacity:1;}
+  100%{opacity:0;transform:translateX(120vw)translateY(50vh)rotate(10deg);}
+}
+@keyframes tail{0%{width:0;}30%{width:100px;}100%{width:0;}}
+
+/* 🌻 Flores */
+.flowers{
+  position:relative;
+  transform:scale(1);
+  z-index:2;
+}
+.flower{
+  position:absolute;
+  bottom:0;
+  transform-origin:bottom center;
+}
+.flower--1{left:-200px;animation:move1 4s ease-in-out infinite;}
+.flower--2{left:-100px;animation:move2 4s ease-in-out infinite;}
+.flower--3{left:0;animation:move3 4s ease-in-out infinite;}
+.flower--4{left:100px;animation:move2 4s ease-in-out infinite;}
+.flower--5{left:200px;animation:move1 4s ease-in-out infinite;}
+
+@keyframes move1{0%,100%{transform:rotate(2deg);}50%{transform:rotate(-2deg);}}
+@keyframes move2{0%,100%{transform:rotate(-1deg);}50%{transform:rotate(1deg);}}
+@keyframes move3{0%,100%{transform:rotate(1deg);}50%{transform:rotate(-1deg);}}
+
+/* pétalos brillantes */
+.flower__leafs{position:relative;}
+.flower__leaf{
+  position:absolute;bottom:0;left:50%;
+  width:24vmin;height:6vmin;border-radius:60%;
+  transform-origin:bottom center;
+  background:linear-gradient(to top,#ffb6ff,#ff8c00,#ffe600);
+  filter:drop-shadow(0 0 10px rgba(255,200,0,0.6));
+}
+.flower__white-circle{
+  position:absolute;left:-4vmin;top:-4vmin;width:10vmin;height:10vmin;
+  border-radius:50%;background:radial-gradient(circle at 30% 30%,#654321,#3b200a);
+}
+.flower__line{
+  height:55vmin;width:2vmin;
+  background:linear-gradient(to top,#2d5016,#4a7c23,#6b8e23);
+}
+
+/* 🌿 Pasto */
+.ground{
+  position:absolute;bottom:0;width:100%;height:10vmin;
+  background:linear-gradient(to top,#005020,#007030);
+  filter:blur(1px);z-index:1;
+}
+
+/* 💬 Mensaje centrado con latido */
+.message {
+  width: 80%;
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* ✅ corregido */
+  color: #ffe6ff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 5vmin;
+  text-align: center;
+  text-shadow: 0 0 15px #ffb6ff, 0 0 35px #ff80ff;
+  opacity: 0;
+
+  /* 🌙 más suave y con retardo antes de aparecer */
+  animation: fadeIn 16s ease-in-out forwards, heartbeat 23s ease-in-out infinite;
+  animation-delay: 10s, 12s; /* ⏳ aparece 3 s después */
+}
+
+@keyframes fadeIn{
+  0%{opacity:0;transform:translate(-50%,-40%) scale(0.95);}
+  100%{opacity:1;transform:translate(-50%,-50%) scale(1);}
+}
+@keyframes heartbeat{
+  0%,100%{transform:translate(-50%,-50%) scale(1);}
+  50%{transform:translate(-50%,-50%) scale(1.05);}
+}
+</style>
+</head>
+<body>
+  <div class="moon"></div>
+  <div id="stars"></div>
+  <div class="shooting-stars"></div>
+
+  <div class="message">💐 Te regalo estas flores<br>para que crezcan como nuestro amor 💖</div>
+
+  <div class="flowers">
+    <!-- tus flores originales -->
+    <div class="flower flower--1"><div class="flower__leafs">
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(0deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(30deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(60deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(90deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(120deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(150deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(180deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(210deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(240deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(270deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(300deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(330deg);"></div>
+      <div class="flower__white-circle"></div>
+    </div><div class="flower__line"></div></div>
+
+    <div class="flower flower--2"><div class="flower__leafs">
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(0deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(30deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(60deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(90deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(120deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(150deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(180deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(210deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(240deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(270deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(300deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(330deg);"></div>
+      <div class="flower__white-circle"></div>
+    </div><div class="flower__line"></div></div>
+
+    <div class="flower flower--3"><div class="flower__leafs">
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(0deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(30deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(60deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(90deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(120deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(150deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(180deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(210deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(240deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(270deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(300deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(330deg);"></div>
+      <div class="flower__white-circle"></div>
+    </div><div class="flower__line"></div></div>
+
+    <div class="flower flower--4"><div class="flower__leafs">
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(0deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(30deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(60deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(90deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(120deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(150deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(180deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(210deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(240deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(270deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(300deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(330deg);"></div>
+      <div class="flower__white-circle"></div>
+    </div><div class="flower__line"></div></div>
+
+    <div class="flower flower--5"><div class="flower__leafs">
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(0deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(30deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(60deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(90deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(120deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(150deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(180deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(210deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(240deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(270deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(300deg);"></div>
+      <div class="flower__leaf" style="transform:translate(-50%,-10%) rotate(330deg);"></div>
+      <div class="flower__white-circle"></div>
+    </div><div class="flower__line"></div></div>
+  </div>
+
+  <div class="ground"></div>
+
+<script>
+const stars=document.getElementById("stars");
+for(let i=0;i<100;i++){
+  const s=document.createElement("div");
+  s.className="star";
+  s.style.left=Math.random()*100+"%";
+  s.style.top=Math.random()*100+"%";
+  s.style.animationDelay=Math.random()*3+"s";
+  stars.appendChild(s);
+}
+function createShootingStar(){
+  const star=document.createElement('div');
+  star.className='shooting-star';
+  star.style.top=Math.random()*60+'%';
+  star.style.animationDelay='0s';
+  star.style.animationDuration=(Math.random()*1.5+2)+'s';
+  document.querySelector('.shooting-stars').appendChild(star);
+  setTimeout(()=>{star.remove();},4000);
+}
+setInterval(()=>{if(Math.random()>0.3){createShootingStar();}},Math.random()*5000+3000);
+</script>
+</body>
+</html>
+</template>
+
+<script>
+const ruletaFrame=document.getElementById('ruletaFrame');
+const floresFrame=document.getElementById('floresFrame');
+
+/* 📥 Cargar contenido desde los templates */
+ruletaFrame.srcdoc=document.getElementById('ruletaHTML').innerHTML;
+floresFrame.srcdoc=document.getElementById('floresHTML').innerHTML;
+
+/* 💌 Comunicación entre escenas */
+window.addEventListener('message',(e)=>{
+  if(e.data==='abrirFlores'){
+    ruletaFrame.classList.add('hide');
+    setTimeout(()=>floresFrame.classList.add('show'),600);
+  }
+});
+
+/* 🎡 Escuchar el botón dentro del iframe */
+ruletaFrame.onload=()=>{
+  const iframeDoc=ruletaFrame.contentDocument;
+  const observer=new MutationObserver(()=>{
+    const btn=iframeDoc.querySelector('button');
+    if(btn){
+      btn.addEventListener('click',()=>{
+        if(btn.textContent.includes('Abrir regalo')){
+          window.postMessage('abrirFlores','*');
+        }
+      });
+    }
+  });
+  observer.observe(iframeDoc.body,{childList:true,subtree:true});
+};
+</script>
+
+
+<script>
+const ruleta = document.getElementById('ruletaFrame');
+const flores = document.getElementById('floresFrame');
+
+/* Escucha cuando se hace click en “Abrir regalo” */
+window.addEventListener('message', (e) => {
+  if (e.data === 'abrirFlores') {
+    ruleta.classList.add('hide');
+    setTimeout(() => {
+      flores.classList.add('show');
+
+      // 🌸 Reinicia la animación del texto dentro del iframe
+      const iframeDoc = flores.contentDocument || flores.contentWindow.document;
+      const msg = iframeDoc.querySelector('.message');
+      if (msg) {
+        msg.style.animation = 'none';
+        void msg.offsetWidth; // reinicia animaciones
+        msg.style.animation = 'fadeIn 7s ease-in-out forwards, heartbeat 10s ease-in-out infinite';
+        msg.style.animationDelay = '0.5s,1s'; // 💫 comienza 3s después de mostrarse
+      }
+    }, 300); // misma demora que la transición de escena
+  }
+});
+
+/* Conecta el botón dentro de la ruleta */
+ruleta.onload = () => {
+  const iframeDoc = ruleta.contentDocument || ruleta.contentWindow.document;
+  const btn = iframeDoc.querySelector('button');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      if (btn.textContent.includes('Abrir regalo')) {
+        window.postMessage('abrirFlores', '*');
+      }
+    });
+  }
+};
+</script>
+
+
+
+</body>
+</html>

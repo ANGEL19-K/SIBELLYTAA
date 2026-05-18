@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#ff1493">
+    <title>Te Amo Sibelly</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a001a 100%);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', 'Arial', system-ui, -apple-system, sans-serif;
+            touch-action: none;
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+        
+        .title-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            z-index: 10;
+            pointer-events: none;
+            padding: 20px;
+        }
+        
+        .title {
+            color: #fff;
+            font-size: clamp(1.5rem, 8vw, 2.5rem);
+            font-weight: bold;
+            text-shadow: 
+                0 0 10px #ff1414,
+                0 0 20px #ff1414,
+                0 0 30px #aa69ff,
+                2px 2px 4px rgba(0,0,0,0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: none;
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px #ff1493, 0 0 10px #ff69b4;
+            }
+            to {
+                text-shadow: 0 0 15px #ff1493, 0 0 25px #ff69b4, 0 0 35px #ff1493;
+            }
+        }
+        
+        .subtitle {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: rgba(255,255,255,0.6);
+            font-size: clamp(0.75rem, 4vw, 1rem);
+            z-index: 10;
+            pointer-events: none;
+            font-style: italic;
+        }
+        
+        .instruction {
+            position: absolute;
+            bottom: 80px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: rgba(255,255,255,0.4);
+            font-size: clamp(0.65rem, 3vw, 0.8rem);
+            z-index: 10;
+            pointer-events: none;
+            animation: fadeInOut 3s ease-in-out infinite;
+        }
+        
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Estilo para el sticker - centrado en el corazón */
+        .sticker-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 25;
+            pointer-events: none;
+            animation: heartbeat 1.5s ease-in-out infinite;
+            filter: drop-shadow(0 0 15px rgba(255,20,147,0.8));
+        }
+        
+        .sticker {
+            width: 125px;
+            height: auto;
+            display: block;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+        }
+        
+        /* Para pantallas más pequeñas */
+        @media (max-width: 768px) {
+            .sticker {
+                width: 70px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .sticker {
+                width: 60px;
+            }
+        }
+        
+        /* Botón de control de música */
+        .music-control {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 30;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,20,147,0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .music-control:hover {
+            background: rgba(255,20,147,0.6);
+            transform: scale(1.1);
+        }
+        
+        .music-control span {
+            color: white;
+            font-size: 20px;
+        }
+        
+        /* Corazón decorativo alrededor del sticker */
+        .heart-decoration {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 130px;
+            height: 130px;
+            z-index: 24;
+            pointer-events: none;
+            animation: rotateHeart 10s linear infinite;
+        }
+        
+        @keyframes rotateHeart {
+            from {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+        
+        .heart-decoration svg {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="title-container">
+        <div class="title">✨ TE AMO SIBELLY HERMOSA ✨</div>
+    </div>
+    
+    <!-- Sticker centrado en el corazón -->
+    <div class="sticker-container" id="stickerContainer">
+        <img class="sticker" id="sticker" alt="Sticker decorativo">
+    </div>
+    
+    <!-- Decoración de corazón giratorio alrededor del sticker -->
+    <div class="heart-decoration" id="heartDecoration" style="display: none;">
+        <svg viewBox="0 0 100 100">
+            <path d="M50,15 L65,30 L80,15 L85,25 L80,35 L65,50 L50,65 L35,50 L20,35 L15,25 L20,15 L35,30 L50,15Z" fill="none" stroke="#ff69b4" stroke-width="2" stroke-dasharray="5,5">
+                <animate attributeName="stroke-dashoffset" from="0" to="1000" dur="10s" repeatCount="indefinite" />
+            </path>
+            <circle cx="50" cy="50" r="8" fill="#ff1493" opacity="0.3">
+                <animate attributeName="r" values="8;12;8" dur="2s" repeatCount="indefinite" />
+            </circle>
+        </svg>
+    </div>
+    
+    <!-- Control de música -->
+    <div class="music-control" id="musicControl">
+        <span>🔊</span>
+    </div>
+    
+    <canvas id="heartCanvas"></canvas>
+
+    <script>
+        (function() {
+            const canvas = document.getElementById('heartCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Optimizar para móvil - reducir partículas en dispositivos móviles
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const PARTICLE_MULTIPLIER = isMobile ? 1.5 : 3;
+            const MAX_PARTICLES = isMobile ? 800 : 1500;
+            
+            let width, height;
+            let particles = [];
+            let heartPoints = [];
+            let animationId = null;
+            let lastTimestamp = 0;
+            
+            // Configuración de música
+            let audio = null;
+            let isMusicPlaying = false;
+            
+            function resizeCanvas() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                generateHeartPoints();
+                initParticles();
+            }
+            
+            // Generar puntos del corazón con mejor resolución
+            function generateHeartPoints() {
+                heartPoints = [];
+                const centerX = width / 2;
+                const centerY = height / 2;
+                
+                // Escala responsiva basada en tamaño de pantalla
+                const scale = Math.min(width, height) / 35;
+                
+                // Más puntos para un corazón más suave
+                const step = isMobile ? 0.08 : 0.05;
+                
+                for (let t = 0; t < Math.PI * 2; t += step) {
+                    // Ecuación paramétrica del corazón
+                    const x = 16 * Math.pow(Math.sin(t), 3);
+                    const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+                    
+                    heartPoints.push({
+                        x: centerX + x * scale,
+                        y: centerY + y * scale
+                    });
+                }
+            }
+            
+            // Colores románticos mejorados
+            const romanticColors = [
+                '#ff69b4', '#ff1493', '#ff3366', '#ff0066', '#ff4d4d',
+                '#ff6b6b', '#ff8787', '#ff9f9f', '#ffb7c5', '#ffc0cb',
+                '#ff99cc', '#ff66cc', '#ff33cc', '#ff00cc', '#ff88aa'
+            ];
+            
+            class Particle {
+                constructor(targetX, targetY, isExplosion = false) {
+                    this.targetX = targetX;
+                    this.targetY = targetY;
+                    this.size = isExplosion ? Math.random() * 4 + 2 : Math.random() * 3 + 1;
+                    this.speed = isExplosion ? 0.15 : 0.025;
+                    this.color = romanticColors[Math.floor(Math.random() * romanticColors.length)];
+                    this.opacity = Math.random() * 0.9 + 0.3;
+                    this.angle = Math.random() * Math.PI * 2;
+                    this.floatOffset = Math.random() * Math.PI * 2;
+                    
+                    if (isExplosion) {
+                        // Partículas de explosión con dirección aleatoria
+                        const angle = Math.random() * Math.PI * 2;
+                        const distance = Math.random() * 150 + 50;
+                        this.x = targetX;
+                        this.y = targetY;
+                        this.targetX = targetX + Math.cos(angle) * distance;
+                        this.targetY = targetY + Math.sin(angle) * distance;
+                        this.speed = 0.05;
+                        this.life = 1;
+                        this.decay = 0.02;
+                    } else {
+                        // Partículas normales empiezan desde bordes aleatorios
+                        this.x = Math.random() * width;
+                        this.y = Math.random() * height;
+                        this.life = 1;
+                        this.decay = 0.002;
+                    }
+                }
+                
+                update(currentTime) {
+                    if (this.life <= 0) return false;
+                    
+                    const dx = this.targetX - this.x;
+                    const dy = this.targetY - this.y;
+                    
+                    this.x += dx * this.speed;
+                    this.y += dy * this.speed;
+                    
+                    // Efecto flotante más suave
+                    const time = currentTime * 0.002;
+                    this.x += Math.sin(time + this.floatOffset) * 0.3;
+                    this.y += Math.cos(time * 0.8 + this.floatOffset) * 0.3;
+                    
+                    // Efecto de brillo variable
+                    this.opacity = 0.5 + Math.sin(time * 2 + this.floatOffset) * 0.3;
+                    
+                    // Reducir vida para partículas de explosión
+                    if (this.decay > 0) {
+                        this.life -= this.decay;
+                    }
+                    
+                    return true;
+                }
+                
+                draw() {
+                    ctx.save();
+                    ctx.globalAlpha = this.opacity * this.life;
+                    ctx.fillStyle = this.color;
+                    
+                    // Sombra para efecto glow
+                    ctx.shadowColor = this.color;
+                    ctx.shadowBlur = 8;
+                    
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Pequeño brillo interior
+                    if (this.size > 2) {
+                        ctx.globalAlpha = (this.opacity * this.life) * 0.5;
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.size * 0.6, 0, Math.PI * 2);
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fill();
+                    }
+                    
+                    ctx.restore();
+                }
+            }
+            
+            function initParticles() {
+                particles = [];
+                const targetCount = Math.min(heartPoints.length * PARTICLE_MULTIPLIER, MAX_PARTICLES);
+                
+                for (let i = 0; i < targetCount; i++) {
+                    const heartPoint = heartPoints[i % heartPoints.length];
+                    particles.push(new Particle(heartPoint.x, heartPoint.y, false));
+                }
+            }
+            
+            // Crear efecto de explosión al tocar
+            function createExplosion(x, y) {
+                const explosionCount = isMobile ? 15 : 25;
+                
+                for (let i = 0; i < explosionCount; i++) {
+                    particles.push(new Particle(x, y, true));
+                }
+                
+                // Limitar número total de partículas
+                if (particles.length > MAX_PARTICLES + 200) {
+                    particles = particles.slice(-MAX_PARTICLES);
+                }
+            }
+            
+            // Crear lluvia de corazones
+            function createHeartRain() {
+                const centerX = width / 2;
+                const centerY = height / 2;
+                const rainCount = isMobile ? 5 : 8;
+                
+                for (let i = 0; i < rainCount; i++) {
+                    const offsetX = (Math.random() - 0.5) * 200;
+                    const offsetY = (Math.random() - 0.5) * 200;
+                    const particle = new Particle(centerX + offsetX, centerY + offsetY, true);
+                    particle.speed = 0.03;
+                    particles.push(particle);
+                }
+            }
+            
+            let lastHeartRain = 0;
+            
+            function animate(currentTime) {
+                if (!canvas.isConnected) return;
+                
+                // Limpiar con efecto de estela persistente
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+                ctx.fillRect(0, 0, width, height);
+                
+                // Actualizar y dibujar partículas
+                particles = particles.filter(particle => {
+                    const alive = particle.update(currentTime);
+                    if (alive) particle.draw();
+                    return alive;
+                });
+                
+                // Efecto de lluvia de corazones cada cierto tiempo
+                if (currentTime - lastHeartRain > 5000) {
+                    lastHeartRain = currentTime;
+                    createHeartRain();
+                }
+                
+                // Asegurar que siempre haya suficientes partículas
+                const minParticles = heartPoints.length * PARTICLE_MULTIPLIER * 0.5;
+                if (particles.length < minParticles && heartPoints.length > 0) {
+                    for (let i = 0; i < 5; i++) {
+                        const heartPoint = heartPoints[Math.floor(Math.random() * heartPoints.length)];
+                        particles.push(new Particle(heartPoint.x, heartPoint.y, false));
+                    }
+                }
+                
+                animationId = requestAnimationFrame(animate);
+            }
+            
+            // Inicializar música
+            function initMusic() {
+                // Usar el enlace de Dropbox convertido a descarga directa
+                const musicUrl = "https://www.dropbox.com/scl/fi/e59uhmg5mpb66bua1i764/ssvtiktok-Si_te_vas_me_quedare_si_vuelve-1769727386.mp3?rlkey=rbizvmhb827bgpvfgz3tqlyvu&dl=1";
+                
+                audio = new Audio(musicUrl);
+                audio.loop = true;
+                audio.volume = 0.5;
+                audio.preload = "auto";
+                
+                // Manejar errores de carga
+                audio.addEventListener('error', (e) => {
+                    console.log("Error al cargar la música:", e);
+                    const musicControl = document.getElementById('musicControl');
+                    musicControl.style.opacity = '0.5';
+                });
+                
+                audio.addEventListener('canplaythrough', () => {
+                    console.log("Música cargada correctamente");
+                });
+            }
+            
+            // Control de música
+            function toggleMusic() {
+                if (!audio) {
+                    initMusic();
+                }
+                
+                if (isMusicPlaying) {
+                    audio.pause();
+                    isMusicPlaying = false;
+                    const musicControl = document.getElementById('musicControl');
+                    musicControl.innerHTML = '<span>🔇</span>';
+                } else {
+                    audio.play().catch(e => {
+                        console.log("Error al reproducir:", e);
+                        // Mostrar mensaje al usuario
+                        const instruction = document.querySelector('.instruction');
+                        const originalText = instruction.innerHTML;
+                        instruction.innerHTML = '💖 Toca de nuevo para activar la música 💖';
+                        setTimeout(() => {
+                            instruction.innerHTML = originalText;
+                        }, 2000);
+                    });
+                    isMusicPlaying = true;
+                    const musicControl = document.getElementById('musicControl');
+                    musicControl.innerHTML = '<span>🔊</span>';
+                }
+            }
+            
+            // Manejo de eventos táctiles y de ratón
+            function handleInteraction(e) {
+                e.preventDefault();
+                
+                let clientX, clientY;
+                
+                if (e.touches) {
+                    // Evento táctil
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                } else {
+                    // Evento de ratón
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                }
+                
+                // Crear múltiples explosiones en área cercana para mejor efecto
+                createExplosion(clientX, clientY);
+                
+                // Pequeña vibración en móviles si está soportado
+                if (isMobile && navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
+                
+                // Intentar iniciar música si aún no se ha iniciado
+                if (!isMusicPlaying && audio) {
+                    toggleMusic();
+                }
+            }
+            
+            // Cargar sticker y mostrarlo en el centro
+            function loadSticker() {
+                const stickerUrl = "https://stickerly.pstatic.net/sticker_pack/swQyWLzxu8Nw7gYQwpEAXg/UUVMBX/31/dc937a30-9934-4a69-832a-7c78cd5b45fb.png";
+                const stickerImg = document.getElementById('sticker');
+                const stickerContainer = document.getElementById('stickerContainer');
+                const heartDecoration = document.getElementById('heartDecoration');
+                
+                stickerImg.onload = () => {
+                    stickerImg.style.display = 'block';
+                    heartDecoration.style.display = 'block';
+                    // Añadir efecto de brillo
+                    setInterval(() => {
+                        if (stickerContainer.style.transform) {
+                            stickerContainer.style.transform = 'translate(-50%, -50%) scale(1.02)';
+                            setTimeout(() => {
+                                stickerContainer.style.transform = 'translate(-50%, -50%) scale(1)';
+                            }, 100);
+                        }
+                    }, 2000);
+                };
+                
+                stickerImg.onerror = () => {
+                    console.log("No se pudo cargar el sticker, usando emoji alternativo");
+                    // Sticker alternativo con emoji si no carga
+                    stickerImg.style.display = 'none';
+                    const altSticker = document.createElement('div');
+                    altSticker.className = 'sticker';
+                    altSticker.style.fontSize = isMobile ? '60px' : '80px';
+                    altSticker.style.textAlign = 'center';
+                    altSticker.innerHTML = '💖✨🌸';
+                    altSticker.style.pointerEvents = 'none';
+                    altSticker.style.filter = 'drop-shadow(0 0 10px #ff69b4)';
+                    stickerContainer.appendChild(altSticker);
+                    heartDecoration.style.display = 'block';
+                };
+                
+                stickerImg.src = stickerUrl;
+            }
+            
+            // Event listeners
+            canvas.addEventListener('touchstart', handleInteraction, { passive: false });
+            canvas.addEventListener('mousedown', handleInteraction);
+            
+            // Control de música
+            const musicControl = document.getElementById('musicControl');
+            musicControl.addEventListener('click', toggleMusic);
+            
+            // Prevenir scroll en móviles
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+            }, { passive: false });
+            
+            // Manejar redimensionamiento
+            window.addEventListener('resize', () => {
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
+                resizeCanvas();
+                animationId = requestAnimationFrame(animate);
+            });
+            
+            // Inicializar todo
+            loadSticker();
+            initMusic();
+            resizeCanvas();
+            animationId = requestAnimationFrame(animate);
+            
+            // Limpieza al descargar
+            window.addEventListener('beforeunload', () => {
+                if (audio) {
+                    audio.pause();
+                    audio = null;
+                }
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>DOMA - Misterio de Mujer</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Great+Vibes&family=Cinzel:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#030108;--dim:#1c0c16;--gold:#E8C87A;--rose:#E8A0B4;--pink:#FF6B9D;--lav:#C4A8CC;--wht:#F0EAE0}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);font-family:'Cormorant Garamond',Georgia,serif;height:100vh;width:100vw;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;user-select:none}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 15% 100%,rgba(140,20,60,.12) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 85% 0%,rgba(80,10,100,.08) 0%,transparent 60%)}
+#notes{position:fixed;inset:0;pointer-events:none;z-index:1}
+.note{position:absolute;pointer-events:none;bottom:-50px;animation:floatUp linear forwards}
+@keyframes floatUp{0%{transform:translateY(0) rotate(-5deg) scale(.8);opacity:0}8%{opacity:1}85%{opacity:.35}100%{transform:translateY(-110vh) rotate(12deg);opacity:0}}
+#stage{position:relative;z-index:2;width:88vw;max-width:1050px;text-align:center;opacity:0;transition:opacity .7s ease}
+#wrap{will-change:transform,opacity}
+.lyric-line{font-size:clamp(2.2rem,5.2vw,5.5rem);font-weight:600;line-height:1.4;letter-spacing:.015em;min-height:1.4em}
+.ww{display:inline-block;transform-origin:center 80%}
+ 
+
+@keyframes holdPulse{
+  0%{transform:scale(1)}
+  50%{transform:scale(1.03)}
+  100%{transform:scale(1)}
+}
+
+.ww.holding{animation:holdPulse var(--hd,1.2s) ease-in-out infinite}
+ 
+.ch{display:inline;color:var(--dim);transition:color .15s ease,text-shadow .15s ease}
+.ch.garamond{font-family:'Cormorant Garamond',serif}
+.ch.playfair{font-family:'Playfair Display',serif}
+.ch.vibes{font-family:'Great Vibes',cursive;font-size:1.15em}
+.ch.cinzel{font-family:'Cinzel',serif;letter-spacing:.08em}
+.ch.soft{font-style:italic;font-weight:400}
+.ch.normal{font-weight:600}
+.ch.dramatic{font-weight:700}
+.ch.passion{font-weight:700}
+.ch.romantic{font-style:italic;font-weight:600}
+.ch.normal.lit{color:var(--gold);text-shadow:0 0 10px rgba(232,200,122,.95),0 0 30px rgba(232,200,122,.55),0 0 65px rgba(232,200,122,.2)}
+.ch.soft.lit{color:var(--lav);text-shadow:0 0 10px rgba(196,168,204,.95),0 0 30px rgba(196,168,204,.5)}
+.ch.dramatic.lit{color:var(--wht);text-shadow:0 0 12px rgba(240,234,224,1),0 0 40px rgba(240,234,224,.65),0 0 85px rgba(240,234,224,.25)}
+.ch.passion.lit{color:var(--pink);text-shadow:0 0 12px rgba(255,107,157,1),0 0 38px rgba(255,107,157,.7),0 0 80px rgba(255,107,157,.3)}
+.ch.romantic.lit{color:var(--rose);text-shadow:0 0 10px rgba(232,160,180,.95),0 0 32px rgba(232,160,180,.55),0 0 68px rgba(232,160,180,.2)}
+.sep{width:120px;height:1px;margin:2.4vh auto;background:linear-gradient(to right,transparent,rgba(196,168,204,.28),transparent)}
+#nexts{line-height:1.75}
+.n1{font-size:clamp(.85rem,1.8vw,1.45rem);color:#2A1220;margin:1.2vh 0;transition:all .5s;font-family:'Playfair Display',serif}
+.n2{font-size:clamp(.75rem,1.4vw,1.15rem);color:#1A0A14;margin:.7vh 0;transition:all .5s}
+.n3{font-size:clamp(.65rem,1.1vw,.95rem);color:#100608;margin:.5vh 0;transition:all .5s}
+@keyframes inUp{from{transform:translateY(46px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes outUp{from{transform:translateY(0);opacity:1}to{transform:translateY(-40px);opacity:0}}
+.in-up{animation:inUp .48s cubic-bezier(.22,1,.36,1) forwards}
+.out-up{animation:outUp .38s cubic-bezier(.64,0,.78,0) forwards}
+#intro{position:fixed;inset:0;background:#000;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1.2s ease}
+#intro h1{font-family:'Great Vibes',cursive;font-size:clamp(5rem,16vw,14rem);font-weight:400;color:var(--rose);letter-spacing:.05em;text-shadow:0 0 60px rgba(232,160,180,.4)}
+#intro .sub{font-family:'Playfair Display',serif;font-size:clamp(.9rem,2vw,1.5rem);color:#4a2030;margin-top:.5rem;font-style:italic;letter-spacing:.16em}
+#btn{margin-top:3.5rem;padding:.9rem 3.2rem;background:transparent;border:1px solid rgba(232,160,180,.35);color:var(--rose);font-family:'Playfair Display',serif;font-size:1rem;cursor:pointer;letter-spacing:.16em;transition:all .3s}
+#btn:hover{background:rgba(232,160,180,.07);box-shadow:0 0 28px rgba(232,160,180,.2)}
+#sync{position:fixed;top:2vh;right:2.5vw;z-index:5;color:#180a10;font-size:.65rem;transition:color .3s;font-family:sans-serif}
+#sync.glow{color:#7a3a50}
+#hint{position:fixed;bottom:2.5vh;left:50%;transform:translateX(-50%);color:#100508;font-size:.65rem;z-index:3;white-space:nowrap;font-family:sans-serif}
+</style>
+</head>
+<body>
+<div id="intro">
+  <h1>Doma</h1>
+  <div class="sub">Misterio de Mujer</div>
+  <button id="btn" onclick="startShow()">&#9654; Comenzar</button>
+</div>
+<div id="notes"></div>
+<div id="stage">
+  <div id="wrap"><div class="lyric-line" id="cur"></div></div>
+  <div class="sep"></div>
+  <div id="nexts"></div>
+</div>
+<div id="sync">[ ] sync</div>
+<audio id="aud" preload="auto"></audio>
+<div id="hint">&#9834; Coloca doma.mp3 aqui &middot; Arrastra MP3 al navegador &middot; [ ] sincronia</div>
+<script>
+var AUDIO_START=91.0;
+var WORDS=[["misterio", 0.0, 0.5, 0, "soft", "garamond"], ["de", 0.5, 0.5, 0, "soft", "garamond"], ["mujeeeer", 1.0, 2.4, 0, "romantic", "vibes"], ["solo", 3.4, 0.5, 1, "normal", "playfair"], ["será", 3.9, 0.6, 1, "normal", "playfair"], ["cuestión", 4.5, 0.6, 1, "normal", "playfair"], ["de", 5.1, 0.3, 1, "normal", "playfair"], ["tiempoooo", 5.4, 1.6, 1, "normal", "playfair"], ["debo", 7.09, 0.4, 2, "normal", "garamond"], ["INTERPRETAR", 7.49, 1.6, 2, "dramatic", "cinzel"], ["tus", 9.2, 0.3, 3, "normal", "garamond"], ["gritos", 9.5, 1.2, 3, "normal", "garamond"], ["Tus", 10.7, 0.09, 3, "soft", "garamond"], ["llamadas", 10.79, 1.2, 3, "soft", "garamond"], ["tus", 11.9, 0.3, 4, "soft", "garamond"], ["caricias", 12.2, 1.1, 4, "soft", "vibes"], ["entrecortadas", 13.3, 2.2, 4, "soft", "garamond"], ["y", 15.7, 0.3, 5, "normal", "garamond"], ["tus", 16.0, 0.5, 5, "normal", "garamond"], ["arranques", 16.5, 0.9, 5, "normal", "garamond"], ["DE", 17.4, 0.6, 6, "dramatic", "cinzel"], ["Pasióooooon", 18.0, 3.2, 6, "passion", "vibes"], ["debo", 21.2, 0.6, 7, "normal", "playfair"], ["buscar", 21.8, 0.8, 7, "normal", "playfair"], ["dentro", 22.6, 0.6, 7, "normal", "playfair"], ["de", 23.2, 0.4, 8, "normal", "garamond"], ["tanto", 23.6, 1.0, 8, "normal", "garamond"], ["desperfectoo", 24.6, 2.1, 8, "normal", "garamond"], ["la", 26.7, 0.09, 9, "soft", "garamond"], ["moraleja", 26.79, 1.2, 9, "soft", "playfair"], ["dee", 27.99, 0.2, 9, "soft", "playfair"], ["este", 28.19, 1.1, 9, "soft", "playfair"], ["cuento", 29.29, 0.5, 9, "soft", "playfair"], ["debo", 29.79, 0.7, 10, "normal", "garamond"], ["domar", 30.49, 1.3, 10, "normal", "garamond"], ["tu", 31.79, 0.09, 10, "normal", "garamond"], ["corazóoon", 31.88, 3.7, 10, "romantic", "vibes"]];
+var CHAR_TIMINGS=[[{"c": "m", "t": 0.0, "hold": false}, {"c": "i", "t": 0.0625, "hold": false}, {"c": "s", "t": 0.125, "hold": false}, {"c": "t", "t": 0.1875, "hold": false}, {"c": "e", "t": 0.25, "hold": false}, {"c": "r", "t": 0.3125, "hold": false}, {"c": "i", "t": 0.375, "hold": false}, {"c": "o", "t": 0.4375, "hold": false}], [{"c": "d", "t": 0.5, "hold": false}, {"c": "e", "t": 0.75, "hold": false}], [{"c": "m", "t": 1.0, "hold": false}, {"c": "u", "t": 1.09, "hold": false}, {"c": "j", "t": 1.18, "hold": false}, {"c": "e", "t": 1.27, "hold": false}, {"c": "e", "t": 1.36, "hold": false}, {"c": "e", "t": 1.45, "hold": false}, {"c": "e", "t": 1.54, "hold": false}, {"c": "r", "t": 1.63, "hold": true}], [{"c": "s", "t": 3.4, "hold": false}, {"c": "o", "t": 3.525, "hold": false}, {"c": "l", "t": 3.65, "hold": false}, {"c": "o", "t": 3.775, "hold": false}], [{"c": "s", "t": 3.9, "hold": false}, {"c": "e", "t": 4.05, "hold": false}, {"c": "r", "t": 4.2, "hold": false}, {"c": "á", "t": 4.35, "hold": false}], [{"c": "c", "t": 4.5, "hold": false}, {"c": "u", "t": 4.575, "hold": false}, {"c": "e", "t": 4.65, "hold": false}, {"c": "s", "t": 4.725, "hold": false}, {"c": "t", "t": 4.8, "hold": false}, {"c": "i", "t": 4.875, "hold": false}, {"c": "ó", "t": 4.95, "hold": false}, {"c": "n", "t": 5.025, "hold": false}], [{"c": "d", "t": 5.1, "hold": false}, {"c": "e", "t": 5.25, "hold": false}], [{"c": "t", "t": 5.4, "hold": false}, {"c": "i", "t": 5.4498, "hold": false}, {"c": "e", "t": 5.4996, "hold": false}, {"c": "m", "t": 5.5493, "hold": false}, {"c": "p", "t": 5.5991, "hold": false}, {"c": "o", "t": 5.6489, "hold": false}, {"c": "o", "t": 5.6987, "hold": false}, {"c": "o", "t": 5.7484, "hold": false}, {"c": "o", "t": 5.7982, "hold": true}], [{"c": "d", "t": 7.09, "hold": false}, {"c": "e", "t": 7.19, "hold": false}, {"c": "b", "t": 7.29, "hold": false}, {"c": "o", "t": 7.39, "hold": false}], [{"c": "I", "t": 7.49, "hold": false}, {"c": "N", "t": 7.6355, "hold": false}, {"c": "T", "t": 7.7809, "hold": false}, {"c": "E", "t": 7.9264, "hold": false}, {"c": "R", "t": 8.0718, "hold": false}, {"c": "P", "t": 8.2173, "hold": false}, {"c": "R", "t": 8.3627, "hold": false}, {"c": "E", "t": 8.5082, "hold": false}, {"c": "T", "t": 8.6536, "hold": false}, {"c": "A", "t": 8.7991, "hold": false}, {"c": "R", "t": 8.9445, "hold": false}], [{"c": "t", "t": 9.2, "hold": false}, {"c": "u", "t": 9.3, "hold": false}, {"c": "s", "t": 9.4, "hold": false}], [{"c": "g", "t": 9.5, "hold": false}, {"c": "r", "t": 9.7, "hold": false}, {"c": "i", "t": 9.9, "hold": false}, {"c": "t", "t": 10.1, "hold": false}, {"c": "o", "t": 10.3, "hold": false}, {"c": "s", "t": 10.5, "hold": false}], [{"c": "T", "t": 10.7, "hold": false}, {"c": "u", "t": 10.73, "hold": false}, {"c": "s", "t": 10.76, "hold": false}], [{"c": "l", "t": 10.79, "hold": false}, {"c": "l", "t": 10.94, "hold": false}, {"c": "a", "t": 11.09, "hold": false}, {"c": "m", "t": 11.24, "hold": false}, {"c": "a", "t": 11.39, "hold": false}, {"c": "d", "t": 11.54, "hold": false}, {"c": "a", "t": 11.69, "hold": false}, {"c": "s", "t": 11.84, "hold": false}], [{"c": "t", "t": 11.9, "hold": false}, {"c": "u", "t": 12.0, "hold": false}, {"c": "s", "t": 12.1, "hold": false}], [{"c": "c", "t": 12.2, "hold": false}, {"c": "a", "t": 12.3375, "hold": false}, {"c": "r", "t": 12.475, "hold": false}, {"c": "i", "t": 12.6125, "hold": false}, {"c": "c", "t": 12.75, "hold": false}, {"c": "i", "t": 12.8875, "hold": false}, {"c": "a", "t": 13.025, "hold": false}, {"c": "s", "t": 13.1625, "hold": false}], [{"c": "e", "t": 13.3, "hold": false}, {"c": "n", "t": 13.4692, "hold": false}, {"c": "t", "t": 13.6385, "hold": false}, {"c": "r", "t": 13.8077, "hold": false}, {"c": "e", "t": 13.9769, "hold": false}, {"c": "c", "t": 14.1462, "hold": false}, {"c": "o", "t": 14.3154, "hold": false}, {"c": "r", "t": 14.4846, "hold": false}, {"c": "t", "t": 14.6538, "hold": false}, {"c": "a", "t": 14.8231, "hold": false}, {"c": "d", "t": 14.9923, "hold": false}, {"c": "a", "t": 15.1615, "hold": false}, {"c": "s", "t": 15.3308, "hold": false}], [{"c": "y", "t": 15.7, "hold": false}], [{"c": "t", "t": 16.0, "hold": false}, {"c": "u", "t": 16.1667, "hold": false}, {"c": "s", "t": 16.3333, "hold": false}], [{"c": "a", "t": 16.5, "hold": false}, {"c": "r", "t": 16.6, "hold": false}, {"c": "r", "t": 16.7, "hold": false}, {"c": "a", "t": 16.8, "hold": false}, {"c": "n", "t": 16.9, "hold": false}, {"c": "q", "t": 17.0, "hold": false}, {"c": "u", "t": 17.1, "hold": false}, {"c": "e", "t": 17.2, "hold": false}, {"c": "s", "t": 17.3, "hold": false}], [{"c": "D", "t": 17.4, "hold": false}, {"c": "E", "t": 17.7, "hold": false}], [{"c": "P", "t": 18.0, "hold": false}, {"c": "a", "t": 18.0727, "hold": false}, {"c": "s", "t": 18.1455, "hold": false}, {"c": "i", "t": 18.2182, "hold": false}, {"c": "ó", "t": 18.2909, "hold": false}, {"c": "o", "t": 18.3636, "hold": false}, {"c": "o", "t": 18.4364, "hold": false}, {"c": "o", "t": 18.5091, "hold": false}, {"c": "o", "t": 18.5818, "hold": false}, {"c": "o", "t": 18.6545, "hold": false}, {"c": "n", "t": 18.7273, "hold": true}], [{"c": "d", "t": 21.2, "hold": false}, {"c": "e", "t": 21.35, "hold": false}, {"c": "b", "t": 21.5, "hold": false}, {"c": "o", "t": 21.65, "hold": false}], [{"c": "b", "t": 21.8, "hold": false}, {"c": "u", "t": 21.9333, "hold": false}, {"c": "s", "t": 22.0667, "hold": false}, {"c": "c", "t": 22.2, "hold": false}, {"c": "a", "t": 22.3333, "hold": false}, {"c": "r", "t": 22.4667, "hold": false}], [{"c": "d", "t": 22.6, "hold": false}, {"c": "e", "t": 22.7, "hold": false}, {"c": "n", "t": 22.8, "hold": false}, {"c": "t", "t": 22.9, "hold": false}, {"c": "r", "t": 23.0, "hold": false}, {"c": "o", "t": 23.1, "hold": false}], [{"c": "d", "t": 23.2, "hold": false}, {"c": "e", "t": 23.4, "hold": false}], [{"c": "t", "t": 23.6, "hold": false}, {"c": "a", "t": 23.8, "hold": false}, {"c": "n", "t": 24.0, "hold": false}, {"c": "t", "t": 24.2, "hold": false}, {"c": "o", "t": 24.4, "hold": false}], [{"c": "d", "t": 24.6, "hold": false}, {"c": "e", "t": 24.6525, "hold": false}, {"c": "s", "t": 24.705, "hold": false}, {"c": "p", "t": 24.7575, "hold": false}, {"c": "e", "t": 24.81, "hold": false}, {"c": "r", "t": 24.8625, "hold": false}, {"c": "f", "t": 24.915, "hold": false}, {"c": "e", "t": 24.9675, "hold": false}, {"c": "c", "t": 25.02, "hold": false}, {"c": "t", "t": 25.0725, "hold": false}, {"c": "o", "t": 25.125, "hold": false}, {"c": "o", "t": 25.1775, "hold": true}], [{"c": "l", "t": 26.7, "hold": false}, {"c": "a", "t": 26.745, "hold": false}], [{"c": "m", "t": 26.79, "hold": false}, {"c": "o", "t": 26.94, "hold": false}, {"c": "r", "t": 27.09, "hold": false}, {"c": "a", "t": 27.24, "hold": false}, {"c": "l", "t": 27.39, "hold": false}, {"c": "e", "t": 27.54, "hold": false}, {"c": "j", "t": 27.69, "hold": false}, {"c": "a", "t": 27.84, "hold": false}], [{"c": "d", "t": 27.99, "hold": false}, {"c": "e", "t": 28.0233, "hold": false}, {"c": "e", "t": 28.0567, "hold": true}], [{"c": "e", "t": 28.19, "hold": false}, {"c": "s", "t": 28.465, "hold": false}, {"c": "t", "t": 28.74, "hold": false}, {"c": "e", "t": 29.015, "hold": false}], [{"c": "c", "t": 29.29, "hold": false}, {"c": "u", "t": 29.3733, "hold": false}, {"c": "e", "t": 29.4567, "hold": false}, {"c": "n", "t": 29.54, "hold": false}, {"c": "t", "t": 29.6233, "hold": false}, {"c": "o", "t": 29.7067, "hold": false}], [{"c": "d", "t": 29.79, "hold": false}, {"c": "e", "t": 29.965, "hold": false}, {"c": "b", "t": 30.14, "hold": false}, {"c": "o", "t": 30.315, "hold": false}], [{"c": "d", "t": 30.49, "hold": false}, {"c": "o", "t": 30.75, "hold": false}, {"c": "m", "t": 31.01, "hold": false}, {"c": "a", "t": 31.27, "hold": false}, {"c": "r", "t": 31.53, "hold": false}], [{"c": "t", "t": 31.79, "hold": false}, {"c": "u", "t": 31.835, "hold": false}], [{"c": "c", "t": 31.88, "hold": false}, {"c": "o", "t": 31.9828, "hold": false}, {"c": "r", "t": 32.0856, "hold": false}, {"c": "a", "t": 32.1883, "hold": false}, {"c": "z", "t": 32.2911, "hold": false}, {"c": "ó", "t": 32.3939, "hold": false}, {"c": "o", "t": 32.4967, "hold": false}, {"c": "o", "t": 32.5994, "hold": false}, {"c": "n", "t": 32.7022, "hold": true}]];
+var LINES_TEXT=["misterio de mujeeeer", "solo será cuestión de tiempoooo", "debo INTERPRETAR", "tus gritos Tus llamadas", "tus caricias entrecortadas", "y tus arranques", "DE Pasióooooon", "debo buscar dentro", "de tanto desperfectoo", "la moraleja dee este cuento", "debo domar tu corazóoon"];
+var HOLD_SET=[2, 7, 21, 27, 30, 36];
+var HOLD_CYCLE={"2": 1.12, "7": 0.77, "21": 1.6, "27": 0.98, "30": 0.7, "36": 1.85}; 
+ 
+var LINES=[];
+for(var i=0;i<WORDS.length;i++){var li=WORDS[i][3];if(!LINES[li])LINES[li]=[];LINES[li].push(i);}
+var aud=document.getElementById('aud');
+var activeLine=-1,inTransition=false,litSet={},heartsGone=false;
+var offset=0.0,startTime=null,usingTimer=false,holdingWW=null;
+ 
+function getT(){if(!usingTimer){if(aud.paused||aud.ended)return -1;return(aud.currentTime-AUDIO_START)+offset;}if(startTime===null)return -1;return((performance.now()-startTime)/1000)+offset;}
+ 
+var NC=["♪","♫","♬","♭"],NCOL=["rgba(232,200,122,","rgba(196,168,204,","rgba(232,160,180,","rgba(255,107,157,"];
+function spawnNote(){var el=document.createElement('span');el.className='note';el.textContent=NC[Math.floor(Math.random()*NC.length)];var dur=5+Math.random()*10,col=NCOL[Math.floor(Math.random()*NCOL.length)];el.style.cssText='left:'+(Math.random()*96)+'vw;font-size:'+(.8+Math.random()*2)+'rem;animation-duration:'+dur+'s;color:'+col+(.08+Math.random()*.35)+')';document.getElementById('notes').appendChild(el);setTimeout(function(){el.remove();},dur*1000);}
+function startNotes(){spawnNote();var n=0;var iv=setInterval(function(){if(Math.random()>.30)spawnNote();if(++n>300)clearInterval(iv);},700);}
+ 
+var hs=document.createElement('style');hs.textContent='@keyframes hf{0%{transform:translateY(0) scale(.4);opacity:0}10%{opacity:1;transform:translateY(-20px) scale(1)}100%{transform:translateY(-160px) translateX(var(--dx)) scale(.5);opacity:0}}';document.head.appendChild(hs);
+function spawnHearts(src){if(!src)return;var r=src.getBoundingClientRect(),emo=["♥","❤","♥","♢"];for(var i=0;i<12;i++){(function(i){setTimeout(function(){var h=document.createElement('span');h.textContent=emo[Math.floor(Math.random()*emo.length)];var dx=(Math.random()-.5)*110;h.style.cssText='position:fixed;pointer-events:none;z-index:200;left:'+(r.left+Math.random()*r.width)+'px;top:'+(r.top+5)+'px;font-size:'+(.9+Math.random()*1.3)+'rem;color:rgba(255,'+(80+Math.floor(Math.random()*80))+',140,'+(.5+Math.random()*.5)+');animation:hf 2s ease-out forwards;--dx:'+dx+'px;';document.body.appendChild(h);setTimeout(function(){h.remove();},2100);},i*140);})(i);}}
+ 
+function renderLine(lineIdx){
+  var el=document.getElementById('cur');el.innerHTML='';
+  var wi2=LINES[lineIdx];
+  for(var wi=0;wi<wi2.length;wi++){
+    if(wi>0)el.appendChild(document.createTextNode(' '));
+    var wdata=WORDS[wi2[wi]],typeCls=wdata[4]||'normal',fontCls=wdata[5]||'garamond';
+    var ww=document.createElement('span');
+    ww.className='ww';ww.setAttribute('data-wi',wi2[wi]);
+    var chars=CHAR_TIMINGS[wi2[wi]];
+    for(var ci=0;ci<chars.length;ci++){
+      var sp=document.createElement('span');
+      sp.className='ch '+typeCls+' '+fontCls;
+      sp.textContent=chars[ci].c;
+      sp.setAttribute('data-wi',wi2[wi]);sp.setAttribute('data-ci',ci);
+      ww.appendChild(sp);
+    }
+    el.appendChild(ww);
+  }
+}
+ 
+function renderNexts(lineIdx){var c=document.getElementById('nexts');c.innerHTML='';var cs=['n1','n2','n3'];for(var j=0;j<3;j++){var ni=lineIdx+j+1;if(ni<LINES_TEXT.length){var d=document.createElement('div');d.className=cs[j];d.textContent=LINES_TEXT[ni];c.appendChild(d);}}}
+ 
+function stopHolding(){if(holdingWW){holdingWW.classList.remove('holding');holdingWW.style.removeProperty('--hd');holdingWW=null;}}
+ 
+function tick(){
+  var t=getT();if(t<0)return;
+  var found=-1;
+  for(var li=0;li<LINES.length;li++){
+    var firstT=CHAR_TIMINGS[LINES[li][0]][0].t,lastW=WORDS[LINES[li][LINES[li].length-1]],lineEnd=(li+1<LINES.length)?CHAR_TIMINGS[LINES[li+1][0]][0].t:lastW[1]+lastW[2]+1.5;
+    if(t>=firstT&&t<lineEnd){found=li;break;}
+  }
+  if(found!==-1&&found!==activeLine&&!inTransition)setActiveLine(found);
+ 
+  if(activeLine>=0){
+    var wi2=LINES[activeLine];
+    for(var wi=0;wi<wi2.length;wi++){
+      var idx=wi2[wi],chars=CHAR_TIMINGS[idx],wdata=WORDS[idx],typeCls=wdata[4];
+      var isHold=HOLD_SET.indexOf(idx)!==-1;
+      for(var ci=0;ci<chars.length;ci++){
+        var key=idx+'_'+ci;
+        if(!litSet[key]&&t>=chars[ci].t){
+          litSet[key]=true;
+          var sp=document.querySelector('.ch[data-wi="'+idx+'"][data-ci="'+ci+'"]');
+          if(sp){
+            sp.classList.add('lit');
+            // Nueva palabra no-hold empieza → detener holding
+            if(!isHold&&ci===0&&holdingWW)stopHolding();
+            // Ultima letra del hold word → palabra entera empieza a pulsar
+            if(isHold&&chars[ci].hold){
+              var ww=document.querySelector('.ww[data-wi="'+idx+'"]');
+              if(ww){
+                stopHolding();
+                holdingWW=ww;
+                // Duracion del ciclo calculada para que quepa en el tiempo restante
+                var cycle=(HOLD_CYCLE[idx]||1.2)+'s';
+                ww.style.setProperty('--hd',cycle);
+                ww.classList.add('holding');
+              }
+            }
+            if(typeCls==='passion'&&ci===0&&!heartsGone){
+              heartsGone=true;
+              setTimeout(function(){spawnHearts(sp);},80);
+              setTimeout(function(){spawnHearts(sp);},1000);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+ 
+function setActiveLine(idx){
+  var wrap=document.getElementById('wrap');inTransition=true;
+  function doRender(){
+    stopHolding();
+    activeLine=idx;heartsGone=false;litSet={};
+    document.getElementById('stage').style.opacity='1';
+    renderLine(idx);renderNexts(idx);
+    wrap.className='';void wrap.offsetWidth;wrap.className='in-up';
+    setTimeout(function(){inTransition=false;},500);
+  }
+  if(activeLine>=0){wrap.className='out-up';setTimeout(doRender,380);}else doRender();
+}
+setInterval(tick,35);
+ 
+function tryLoadAudio(){var files=['doma.mp3','doma.wav','musica.mp3','cancion.mp3'],fi=0;function next(){if(fi>=files.length){usingTimer=true;startTime=performance.now();return;}aud.src=files[fi++];aud.load();function onReady(){aud.removeEventListener('canplay',onReady);aud.removeEventListener('error',onErr);aud.currentTime=AUDIO_START;aud.play().catch(function(){usingTimer=true;startTime=performance.now();});}function onErr(){aud.removeEventListener('canplay',onReady);aud.removeEventListener('error',onErr);next();}aud.addEventListener('canplay',onReady);aud.addEventListener('error',onErr);}next();}
+function startShow(){document.getElementById('intro').style.opacity='0';setTimeout(function(){document.getElementById('intro').style.display='none';},1200);startNotes();tryLoadAudio();}
+var syncT=null;document.addEventListener('keydown',function(e){if(e.key==='['){offset-=0.1;showSync();}if(e.key===']'){offset+=0.1;showSync();}});
+function showSync(){var el=document.getElementById('sync');el.textContent='sync '+(offset>=0?'+':'')+offset.toFixed(1)+'s  [ ]';el.className='glow';clearTimeout(syncT);syncT=setTimeout(function(){el.className='';},2500);}
+document.addEventListener('dragover',function(e){e.preventDefault();});
+document.addEventListener('drop',function(e){e.preventDefault();var f=e.dataTransfer.files[0];if(f&&f.type.indexOf('audio')===0){usingTimer=false;aud.src=URL.createObjectURL(f);aud.currentTime=AUDIO_START;aud.play();document.getElementById('hint').textContent='♪ '+f.name+' - desde 1:31';document.getElementById('hint').style.color='#3a1828';}});
+</script>
+</body>
+</html>

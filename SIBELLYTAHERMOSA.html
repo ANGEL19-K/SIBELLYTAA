@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Carta para mi Amor</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #000;
+      height: 100vh;
+    }
+
+    canvas#fireworks {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    .heart-container {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      cursor: pointer;
+    }
+
+    .heart {
+      width: 220px;
+      filter: drop-shadow(0 0 20px red);
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    .card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      width: 90%;
+      max-width: 500px;
+      border-radius: 15px;
+      text-align: center;
+      z-index: 3;
+      box-shadow: 0 0 30px rgba(255,255,255,0.4);
+      transition: all 0.6s ease-in-out;
+    }
+
+    .card.show {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .card h1 {
+      color: #b4004e;
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+    }
+
+    .card p {
+      font-size: 1.2rem;
+      color: #222;
+      margin: 10px 0;
+      line-height: 1.5;
+    }
+
+    .sticker-container {
+      margin: 20px 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .sticker {
+      max-width: 150px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    button#backBtn {
+      margin-top: 20px;
+      background: #b4004e;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button#backBtn:hover {
+      background: #92003e;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="fireworks"></canvas>
+
+  <div class="heart-container" id="heartContainer">
+    <img 
+      src="https://cdn-icons-png.flaticon.com/512/833/833472.png" 
+      class="heart" 
+      id="heart" 
+      alt="Heart"
+    >
+  </div>
+
+  <div class="card" id="card">
+    <h1>¡Felicidades por tu primer día, amorcito! 🎒❤️</h1>
+    <p>
+      Felicidades por tu primer día de clases en el tercer semestre, mi SENATINA hermosa JAJAJ 💖 
+      Estoy tan orgulloso de ti. Este es uno de los muchos logros que vas a lograr este año y es solo el comienzo de todo lo maravilloso que viene para ti.
+    </p>
+    
+    <div class="sticker-container">
+      <img 
+        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4wpeStIsIxv3uGWq3EDHgKe5kWtOgbob9PQ&s" 
+        alt="Sticker de amor"
+        class="sticker"
+      >
+    </div>
+
+    <p>
+      Te amoo Muchoteee.<br><strong>De: ANGELIÑO NEGROSIÑO</strong> 💖
+    </p>
+    <button id="backBtn">← Regresar</button>
+  </div>
+
+  <audio id="heartbeat" loop preload="auto">
+    <source src="https://dl.dropboxusercontent.com/scl/fi/cs1rdhxfb77pq41ryf02d/WhatsApp-Video-2025-12-31-at-5.23.12-PM-_1_.mp3.mp3?rlkey=tggvyw5tehygayaaroqqdisu1&st=7bcpfq7s&dl=0" type="audio/mpeg">
+    Tu navegador no soporta el elemento de audio.
+  </audio>
+
+  <script>
+    const heart = document.getElementById("heart");
+    const card = document.getElementById("card");
+    const heartContainer = document.getElementById("heartContainer");
+    const heartbeat = document.getElementById("heartbeat");
+    const backBtn = document.getElementById("backBtn");
+
+    // Configurar volumen y reproducción
+    heartbeat.volume = 0.5; // Volumen al 50%
+
+    // Función para intentar reproducir audio (necesario por políticas de autoplay)
+    function playAudio() {
+      heartbeat.play().catch(error => {
+        console.log("Auto reproducción bloqueada, esperando interacción:", error);
+      });
+    }
+
+    // Intentar reproducir al cargar la página
+    window.onload = () => {
+      playAudio();
+    };
+
+    // También intentar reproducir al hacer clic en el corazón (por si el navegador bloquea el autoplay)
+    heart.addEventListener("click", () => {
+      card.classList.add("show");
+      heartContainer.style.display = "none";
+      playAudio(); // Reintentar reproducción
+    });
+
+    // Regresar
+    backBtn.addEventListener("click", () => {
+      card.classList.remove("show");
+      heartContainer.style.display = "block";
+    });
+
+    // Fuegos artificiales
+    const canvas = document.getElementById("fireworks");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let fireworks = [];
+
+    function random(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    class Firework {
+      constructor() {
+        this.x = random(0, canvas.width);
+        this.y = canvas.height;
+        this.targetY = random(100, canvas.height / 2);
+        this.color = `hsl(${Math.floor(random(0, 360))}, 100%, 50%)`;
+        this.radius = 2;
+        this.speed = random(3, 6);
+        this.exploded = false;
+        this.particles = [];
+      }
+
+      update() {
+        if (!this.exploded) {
+          this.y -= this.speed;
+          if (this.y <= this.targetY) {
+            this.exploded = true;
+            this.explode();
+          }
+        } else {
+          this.particles.forEach(p => p.update());
+          this.particles = this.particles.filter(p => p.alpha > 0);
+        }
+      }
+
+      explode() {
+        for (let i = 0; i < 50; i++) {
+          this.particles.push(new Particle(this.x, this.y, this.color));
+        }
+      }
+
+      draw() {
+        if (!this.exploded) {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+        } else {
+          this.particles.forEach(p => p.draw());
+        }
+      }
+    }
+
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.angle = random(0, Math.PI * 2);
+        this.speed = random(1, 5);
+        this.alpha = 1;
+        this.decay = random(0.01, 0.03);
+        this.color = color;
+      }
+
+      update() {
+        this.x += Math.cos(this.angle) * this.speed;
+        this.y += Math.sin(this.angle) * this.speed;
+        this.alpha -= this.decay;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      ctx.fillStyle = "rgba(0,0,0,0.2)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (Math.random() < 0.05) {
+        fireworks.push(new Firework());
+      }
+
+      fireworks.forEach(fw => {
+        fw.update();
+        fw.draw();
+      });
+
+      fireworks = fireworks.filter(fw => !fw.exploded || fw.particles.length > 0);
+    }
+
+    animate();
+
+    window.onresize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+  </script>
+</body>
+</html>

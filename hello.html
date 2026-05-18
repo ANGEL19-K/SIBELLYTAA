@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Hello Kitty – Juego Kawaii Sí o No</title>
+
+<style>
+    body{
+        font-family: "Comic Sans MS", sans-serif;
+        background: linear-gradient(#ffd6e8, #ffeef6);
+        text-align: center;
+        overflow-x: hidden;
+    }
+
+    h1{
+        color: #ff6eb4;
+        margin-top: 40px;
+        font-size: 35px;
+        text-shadow: 2px 2px #ffffff;
+    }
+
+    .kitty{
+        width: 180px;
+        margin-top: 10px;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float{
+        0%{ transform: translateY(0); }
+        50%{ transform: translateY(-12px); }
+        100%{ transform: translateY(0); }
+    }
+
+    button{
+        font-size: 22px;
+        border: none;
+        border-radius: 30px;
+        cursor: pointer;
+        margin: 20px;
+        transition: 0.25s;
+    }
+
+    #si{
+        background-color: #ff80c8;
+        color: white;
+        box-shadow: 0 0 15px #ffa8dd;
+        padding: 18px 28px;
+    }
+
+    #no{
+        background-color: #fff0f6;
+        color: #ff6eb4;
+        border: 2px solid #ffb6d9;
+        padding: 18px 28px;
+    }
+
+    #mensaje{
+        font-size: 26px;
+        margin-top: 20px;
+        color: #ff60b0;
+        min-height: 40px; 
+    }
+
+    .corazon{
+        position: absolute;
+        color: #ff8ac6;
+        font-size: 25px;
+        animation: volar 4s linear infinite;
+        opacity: 0.8;
+    }
+
+    @keyframes volar{
+        0%{ transform: translateY(0); opacity: 1; }
+        100%{ transform: translateY(-600px); opacity: 0; }
+    }
+</style>
+</head>
+
+<body>
+
+<h1>🌸 ¿Vamos a jugar esta semana a Minecraft? 🎮💖</h1>
+
+<img class="kitty" src="https://tse4.mm.bing.net/th/id/OIP.C0pNN2PuXpHxRZBAHxUskgHaHa?rs=1&pid=ImgDetMain&o=7&rm=3">
+
+<br>
+
+<button id="si">Sí 💗</button>
+<button id="no">No 😳</button>
+
+<h2 id="mensaje"></h2>
+
+<audio id="sonido" src="https://cdn.pixabay.com/audio/2022/03/15/audio_1c3efea289.mp3"></audio>
+
+<script>
+    let escala = 1;
+    let intentos = 0;
+
+    const siBtn = document.getElementById("si");
+    const noBtn = document.getElementById("no");
+    const mensaje = document.getElementById("mensaje");
+    const sonido = document.getElementById("sonido");
+
+    function crearCorazon(){
+        const corazon = document.createElement("div");
+        corazon.classList.add("corazon");
+        corazon.innerHTML = "💗";
+        corazon.style.left = Math.random() * window.innerWidth + "px";
+        corazon.style.bottom = "0px";
+        corazon.style.fontSize = (20 + Math.random()*20) + "px";
+        document.body.appendChild(corazon);
+
+        setTimeout(() => corazon.remove(), 4000);
+    }
+
+    setInterval(crearCorazon, 600);
+
+    noBtn.addEventListener("mouseover", () => {
+        intentos++;
+        escala += 0.20;
+
+        // el botón crece sin tapar la letra
+        siBtn.style.transform = `scale(${escala})`;
+        siBtn.style.padding = `${18 * escala}px ${28 * escala}px`;
+
+        if(intentos === 1){
+            mensaje.innerHTML = "Ehhh 😳 ¿segura que No? 💕";
+        }
+        if(intentos === 5){
+            mensaje.innerHTML = "Nooo 😭 presiona SÍ porfaaa 💗";
+        }
+        if(intentos >= 10){
+            mensaje.innerHTML = "Ya fue 😆 dale SÍ 💞";
+            noBtn.disabled = true;
+        }
+    });
+
+    siBtn.addEventListener("click", () => {
+        sonido.play();
+
+        mensaje.innerHTML = 
+            "Perfecto 💖✨ Entonces dime: ¿a qué hora podemos jugar? 🩷🎮";
+
+        noBtn.style.display = "none";
+
+        // reset visual del SI
+        siBtn.style.transform = "scale(1)";
+        siBtn.style.padding = "18px 28px";
+    });
+</script>
+
+</body>
+</html>
