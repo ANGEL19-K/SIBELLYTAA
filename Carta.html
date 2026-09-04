@@ -4,7 +4,264 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cartas para Sibelly</title>
-  <link rel="stylesheet" href="index.css">
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap");
+
+    :root {
+      --envelope-x: min(300px, calc(100vw - 2rem));
+      --envelope-y: min(200px, calc(100dvh - 2rem));
+      --envelope-bg: Moccasin;
+      --envelope-shadow: Peru;
+      --letter-x: min(250px, calc(100vw - 2rem));
+      --letter-y: min(calc(250px - 1rem - 10px), calc(100dvh - 2rem));
+      --letter-bg: AntiqueWhite;
+      --letter-shadow: BurlyWood;
+      --letter-text: #180d07;
+      --letter-font: "Dancing Script", serif;
+      --letter-button-text: darkred;
+      --heart-bg: darkred;
+      --heart-text: white;
+      --bodybg: darkred;
+    }
+
+    @media (min-width: 650px) {
+      :root {
+        --envelope-x: min(600px, calc(100vw - 2rem));
+        --envelope-y: min(400px, calc(100dvh - 2rem));
+        --letter-x: min(500px, calc(100vw - 2rem));
+        --letter-y: min(calc(400px - 1rem - 10px), calc(100dvh - 2rem));
+      }
+    }
+
+    html {
+      font-size: 20px;
+    }
+
+    body {
+      background-color: var(--bodybg);
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .cssletter {
+      position: relative;
+      width: 100%;
+      height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .envelope {
+      position: relative;
+      width: var(--envelope-x);
+      height: var(--envelope-y);
+      background: var(--envelope-bg);
+      box-shadow: inset 0 0 30px -5px var(--envelope-shadow), 0 0 50vw 0 #540000;
+    }
+
+    .letters {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      visibility: hidden;
+    }
+
+    .envelope.active ~ .letters {
+      z-index: 5;
+      visibility: visible;
+    }
+
+    .envelope::before {
+      content: "˚ʚ❤︎ɞ˚";
+      font-size: 5rem;
+      color: white;
+      position: absolute;
+      left: 50%;
+      top: 30%;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: soft-light;
+    }
+
+    .envelope-flap {
+      width: 100%;
+      height: 71%;
+      position: absolute;
+      top: 0;
+      z-index: 3;
+      overflow: hidden;
+      transition: 0.6s linear all;
+      transform-origin: top;
+      pointer-events: all;
+    }
+
+    .envelope-folds {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 2;
+      position: absolute;
+      inset: 0;
+    }
+
+    .envelope-flap::before,
+    .envelope-left::before,
+    .envelope-right::before,
+    .envelope-bottom::before {
+      content: "";
+      transform: rotate(45deg);
+      background: var(--envelope-bg);
+      box-shadow: 0 0 30px -5px var(--envelope-shadow);
+      width: 100%;
+      aspect-ratio: 1;
+      display: block;
+      position: absolute;
+      top: 60%;
+    }
+
+    .envelope-flap::before {
+      bottom: 30px;
+      border-radius: 5rem;
+      top: auto;
+    }
+
+    @media (min-width: 650px) {
+      .envelope-flap::before {
+        bottom: 100px;
+      }
+    }
+
+    .envelope-left::before { top: 10%; left: -65%; }
+    .envelope-right::before { top: 10%; right: -65%; }
+    .envelope-bottom::before { top: 60%; border-radius: 5rem; }
+
+    .heart {
+      z-index: 4;
+      position: relative;
+      box-shadow: none;
+      border: none;
+      width: 70px;
+      aspect-ratio: 1;
+      background: radial-gradient(circle at 60% 65%, var(--heart-bg) 64%, #0000 65%) top left/50% 50%,
+        radial-gradient(circle at 40% 65%, var(--heart-bg) 64%, #0000 65%) top right/50% 50%,
+        conic-gradient(from -45deg at 50% 85.5%, var(--heart-bg) 90deg, #0000 0) bottom/100% 50%;
+      background-repeat: no-repeat;
+      left: 50%;
+      top: 70%;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    @media (min-width: 650px) {
+      .heart, .heart::before { width: 150px; }
+    }
+
+    .heart::before {
+      content: "";
+      display: block;
+      position: absolute;
+      width: 70px;
+      aspect-ratio: 1;
+      background: radial-gradient(circle at 60% 65%, #ffffff26 64%, #0000 65%) top left/50% 50%,
+        radial-gradient(circle at 40% 65%, #ffffff26 64%, #0000 65%) top right/50% 50%,
+        conic-gradient(from -45deg at 50% 85.5%, #ffffff26 90deg, #0000 0) bottom/100% 50%;
+      background-repeat: no-repeat;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      transition: 0.3s ease all;
+      z-index: -1;
+    }
+
+    .heart:hover, .heart:active, .heart:focus {
+      transform: translate(-50%, -50%);
+      background-color: transparent;
+      color: var(--heart-text);
+    }
+
+    .heart:hover::before, .heart:active::before, .heart:focus::before {
+      transform: translate(-50%, -50%) scale(0.8);
+    }
+
+    .heart-text {
+      transform: translateY(-10px);
+      display: block;
+      color: var(--heart-text);
+      font-size: 1.5rem;
+      font-family: var(--letter-font);
+    }
+
+    .envelope.active * { pointer-events: none; }
+    .envelope.active .envelope-flap { transform: rotateX(-180deg) translateY(0); perspective: 10px; }
+    .envelope.active .envelope-flap::before { box-shadow: inset 0 0 30px -5px var(--envelope-shadow); }
+    .envelope.active .heart { display: none; }
+
+    .letter {
+      box-sizing: border-box;
+      font-family: var(--letter-font);
+      font-size: 1.2rem;
+      line-height: 1.3;
+      background-color: var(--letter-bg);
+      color: var(--letter-text);
+      width: var(--letter-x);
+      height: var(--letter-y);
+      user-select: none;
+      box-shadow: inset 0 0 20px -5px var(--letter-shadow), 0 5px 15px rgba(0,0,0,0.3);
+      padding: 3rem 1.5rem 1rem;
+      margin: 0;
+      cursor: grab;
+      position: absolute;
+      top: calc(50% - var(--letter-y) / 2);
+      overflow: auto;
+      text-align: center;
+      border: 0;
+      pointer-events: auto;
+      touch-action: none;
+    }
+
+    .letter:active { cursor: grabbing; }
+    .letter.center { display: flex; align-items: center; justify-content: center; flex-direction: column; }
+    .letter:nth-child(even), .letter:nth-child(odd) { transform: none; }
+
+    .closeLetter {
+      font-size: 0 !important;
+      position: absolute;
+      top: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: none;
+      box-shadow: none;
+      padding: 0;
+      border: 0;
+      cursor: pointer;
+    }
+
+    .closeLetter::before {
+      content: "˚ʚ❤︎ɞ˚";
+      font-size: 1.5rem !important;
+      font-family: var(--letter-font);
+      color: var(--letter-button-text);
+      text-align: center;
+    }
+
+    .closeLetter:hover::before, .closeLetter:active::before, .closeLetter:focus::before { content: "xXx"; }
+
+    .song-link {
+      color: var(--heart-bg);
+      font-weight: bold;
+      font-size: 1.3rem;
+      text-decoration: underline;
+      margin-top: 15px;
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    .song-link:hover { color: var(--envelope-shadow); }
+  </style>
 </head>
 <body>
 <section class="cssletter">
@@ -32,12 +289,12 @@
 
     <blockquote class="letter center" id="2" tabindex="0">
       <button class="closeLetter" title="Cerrar carta">Cerrar carta</button>
-      <p>Cada mirada compartida contigo, mi hermosa niña hermosa, hace que los momentos más simples brillen con alegría y magia. Contigo siento que vivo en mi propia película romántica y aveces de terror cuando te enojas jaja pero terror bonito (se enoja seguro te amo cuchurrumin).</p>
+      <p>Cada mirada compartida contigo, mi hermoso niño, hace que los momentos más simples brillen con alegría y magia. Contigo siento que vivo en mi propia película romántica.</p>
     </blockquote>
 
     <blockquote class="letter center" id="3" tabindex="0">
       <button class="closeLetter" title="Cerrar carta">Cerrar carta</button>
-      <p>Te amo muchote mi cuchurrumin se que aveces podemos ser un poquito picones y peliones pero nunca te he dejado de amar eres y seras lo mejor que me paso mi vida</p>
+      <p>En tus brazos encuentro paz y aventura. Eres la calma en mi tormenta y la chispa que enciende mi pasión, haciendo de cada día una hermosa sorpresa, Sibelly.</p>
     </blockquote>
 
     <blockquote class="letter center" id="4" tabindex="0">
@@ -47,17 +304,73 @@
 
     <blockquote class="letter center" id="5" tabindex="0">
       <button class="closeLetter" title="Cerrar carta">Cerrar carta</button>
-      <p>Para mi querida Sibelly Tu corazón es el refugio donde el mío encuentra consuelo, Juntos creamos un mundo donde cada gesto de amor se convierte en una obra de arte te amo mucho mi sibellyta hermosa.</p>
+      <p>Para mi querido Sibelly neto hermoso: Tu corazón es el refugio donde el mío encuentra consuelo. Juntos creamos un mundo donde cada gesto de amor se convierte en una obra de arte.</p>
     </blockquote>
 
     <blockquote class="letter center" id="6" tabindex="0">
       <button class="closeLetter" title="Cerrar carta">Cerrar carta</button>
-      <p>Me encanta la forma en que iluminas mi vida. Tu humor y tu cariño infinito hacen que cada momento a tu lado se sienta como el regalo más especial del mundo, desperter y saber que tu estas conmigo es lo mejor que me ha pasado :3</p>
+      <p>Me encanta la forma en que iluminas mi vida. Tu humor y tu cariño infinito hacen que cada momento a tu lado se sienta como el regalo más especial del mundo. Te quiero muchísimo.</p>
     </blockquote>
 
   </div>
 </section>
 
-<script src="index.js" defer></script>
+<script>
+  const letters = document.querySelectorAll(".letter");
+  const lettersContainer = document.querySelector(".letters");
+  let zIndexCounter = 10;
+
+  const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  };
+
+  const shuffledThings = Array.from(letters);
+  shuffleArray(shuffledThings);
+
+  shuffledThings.forEach((letter) => {
+    lettersContainer.appendChild(letter);
+    const center = document.querySelector(".cssletter").offsetWidth / 2 - letter.offsetWidth / 2;
+    letter.style.left = `${center}px`;
+
+    if (!(letter.scrollHeight > letter.clientHeight || letter.scrollWidth > letter.clientWidth)) {
+      letter.classList.add("center");
+    }
+
+    let offsetX;
+    let offsetY;
+    letter.addEventListener("pointerdown", (event) => {
+      if (event.target.tagName === "BUTTON" || event.target.tagName === "A") return;
+      const rect = letter.getBoundingClientRect();
+      letter.setPointerCapture(event.pointerId);
+      letter.style.position = "fixed";
+      letter.style.left = `${rect.left}px`;
+      letter.style.top = `${rect.top}px`;
+      offsetX = event.clientX - rect.left;
+      offsetY = event.clientY - rect.top;
+      letter.style.zIndex = zIndexCounter++;
+    });
+
+    letter.addEventListener("pointermove", (event) => {
+      if (!letter.hasPointerCapture(event.pointerId)) return;
+      letter.style.left = `${event.clientX - offsetX}px`;
+      letter.style.top = `${event.clientY - offsetY}px`;
+    });
+  });
+
+  document.querySelector("#openEnvelope").addEventListener("click", () => {
+    document.querySelector(".envelope").classList.add("active");
+  });
+
+  document.querySelectorAll(".closeLetter").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      const letter = event.target.closest(".letter");
+      if (letter) letter.style.display = "none";
+    });
+  });
+</script>
 </body>
 </html>
