@@ -1,82 +1,156 @@
-const letters = document.querySelectorAll(".letter");
-const lettersContainer = document.querySelector(".letters");
-let zIndexCounter = 10;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-const shuffleArray = (array) => {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-};
+body {
+  background-color: #fdf2f8; /* Un rosa muy tenue y romántico */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden; /* Evita que la pantalla baje al arrastrar cartas en celular */
+}
 
-const shuffledThings = Array.from(letters);
-shuffleArray(shuffledThings);
+.cssletter {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
 
-shuffledThings.forEach((letter) => {
-  lettersContainer.appendChild(letter);
-  
-  // Variables para recordar dónde está la carta en la pantalla
-  let currentX = 0;
-  let currentY = 0;
-  let startX = 0;
-  let startY = 0;
-  let isDragging = false;
+/* --- Diseño del Sobre --- */
+.envelope {
+  position: relative;
+  width: 90vw; /* Se adapta al ancho del celular */
+  max-width: 350px;
+  height: 220px;
+  background-color: #f472b6;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  z-index: 3;
+  transition: all 0.5s ease;
+}
 
-  letter.addEventListener("pointerdown", (e) => {
-    // Evita mover si presiona un botón o el enlace de la canción
-    if (e.target.tagName === "BUTTON" || e.target.tagName === "A") return;
-    
-    isDragging = true;
-    
-    // 1. Apagamos la animación temporalmente para que siga tu dedo al instante
-    letter.style.transition = "none";
-    letter.style.zIndex = zIndexCounter++;
-    
-    // 2. "Atrapamos" el dedo para que no pierda la carta si mueves muy rápido
-    letter.setPointerCapture(e.pointerId);
+.envelope-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #ec4899;
+  clip-path: polygon(0 0, 50% 50%, 100% 0);
+  transform-origin: top;
+  transition: transform 0.6s ease-in-out;
+  z-index: 4;
+}
 
-    // 3. Calculamos la posición inicial
-    startX = e.clientX - currentX;
-    startY = e.clientY - currentY;
-  });
+/* Dobleces inferiores y laterales del sobre */
+.envelope-folds {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: transparent;
+  clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 0, 50% 50%);
+  background-color: #f9a8d4;
+  z-index: 3;
+  border-radius: 0 0 10px 10px;
+}
 
-  letter.addEventListener("pointermove", (e) => {
-    if (!isDragging) return;
-    
-    // Calculamos la nueva posición según cuánto moviste el dedo
-    currentX = e.clientX - startX;
-    currentY = e.clientY - startY;
+/* Animación de apertura */
+.envelope.active .envelope-flap {
+  transform: rotateX(180deg);
+  z-index: 1;
+}
 
-    // 4. Movemos la carta de forma súper fluida sin cambiar su estructura
-    letter.style.transform = `translate(${currentX}px, ${currentY}px)`;
-  });
+/* Botón de Corazón */
+.heart {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #be123c;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 10px 20px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 5;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  transition: opacity 0.3s ease;
+}
 
-  const stopDrag = (e) => {
-    isDragging = false;
-    // Soltamos la carta
-    if(letter.hasPointerCapture(e.pointerId)) {
-      letter.releasePointerCapture(e.pointerId);
-    }
-  };
+.envelope.active .heart {
+  opacity: 0;
+  pointer-events: none;
+}
 
-  letter.addEventListener("pointerup", stopDrag);
-  letter.addEventListener("pointercancel", stopDrag);
-});
+/* --- Diseño de las Cartas --- */
+.letters {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -10%);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 2;
+}
 
-// Lógica para abrir el sobre
-document.querySelector("#openEnvelope").addEventListener("click", () => {
-  document.querySelector(".envelope").classList.add("active");
-  document.querySelector(".letters").classList.add("active");
-});
+.letter {
+  position: absolute;
+  width: 85vw; /* Casi todo el ancho del celular */
+  max-width: 320px;
+  background: white;
+  padding: 25px 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1rem;
+  color: #333;
+  line-height: 1.5;
+  touch-action: none; /* Crucial: permite que el navegador ceda el control táctil a tu JS */
+  opacity: 0;
+  top: 50px;
+  transition: opacity 0.5s ease, top 0.5s ease;
+  pointer-events: none; /* Inactivas hasta que se abra el sobre */
+}
 
-// Lógica para cerrar cada carta
-const closeButtons = document.querySelectorAll(".closeLetter");
-closeButtons.forEach((button) => {
-  button.addEventListener("click", (e) => {
-    e.preventDefault();
-    const letter = e.target.closest(".letter");
-    if (letter) {
-      letter.style.display = "none";
-    }
-  });
-});
+.letters.active .letter {
+  opacity: 1;
+  top: -80px; /* Las cartas sobresalen un poco cuando se abre */
+  pointer-events: auto;
+  cursor: grab;
+}
+
+.letter:active {
+  cursor: grabbing;
+}
+
+.closeLetter {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #f43f5e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.song-link {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 8px 15px;
+  background-color: #10b981;
+  color: white;
+  text-decoration: none;
+  border-radius: 20px;
+  font-weight: bold;
+}
