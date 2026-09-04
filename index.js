@@ -14,52 +14,54 @@ shuffleArray(shuffledThings);
 
 shuffledThings.forEach((letter) => {
   lettersContainer.appendChild(letter);
-  const center = document.querySelector(".cssletter").offsetWidth / 2 - letter.offsetWidth / 2;
-  letter.style.left = `${center}px`;
-
-  function isOverflown(element) {
-    return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
-  }
-
-  if (!isOverflown(letter)) {
-    letter.classList.add("center");
-  }
-  let offsetX, offsetY;
   
-  letter.addEventListener("mousedown", (e) => {
-    // AQUÍ ESTÁ EL TRUCO: Evita arrastrar si toca el botón de cerrar O el link de la música (etiqueta "A")
-    if (e.target.tagName !== "BUTTON" && e.target.tagName !== "A") {
-      const rect = e.target.getBoundingClientRect();
+  // Soporte para arrastrar con dedo (Touch) o con Mouse
+  const handleDragStart = (e) => {
+    // Evita arrastrar si toca el botón de cerrar o el link de la música
+    if (e.target.tagName === "BUTTON" || e.target.tagName === "A") return;
+    
+    const isTouch = e.type === "touchstart";
+    const clientX = isTouch ? e.touches[0].clientX : e.clientX;
+    const clientY = isTouch ? e.touches[0].clientY : e.clientY;
 
-      letter.style.position = "fixed";
-      letter.style.left = `${rect.left}px`;
-      letter.style.top = `${rect.top}px`;
+    const rect = letter.getBoundingClientRect();
 
-      offsetX = e.clientX - rect.left;
-      offsetY = e.clientY - rect.top;
+    letter.style.position = "fixed";
+    letter.style.left = `${rect.left}px`;
+    letter.style.top = `${rect.top}px`;
 
-      letter.style.zIndex = zIndexCounter++;
-      
-      const moveAt = (posX, posY) => {
-        letter.style.left = `${posX - offsetX}px`;
-        letter.style.top = `${posY - offsetY}px`;
-      };
-      
-      const onMouseMove = (moveEvent) => moveAt(moveEvent.clientX, moveEvent.clientY);
-      
-      const onMouseUp = () => {
-        document.removeEventListener("mousemove", onMouseMove);
-        document.removeEventListener("mouseup", onMouseUp);
-      };
-      
-      document.addEventListener("mousemove", onMouseMove);
-      document.addEventListener("mouseup", onMouseUp);
-    }
-  });
+    let offsetX = clientX - rect.left;
+    let offsetY = clientY - rect.top;
+
+    letter.style.zIndex = zIndexCounter++;
+    
+    const moveAt = (posX, posY) => {
+      letter.style.left = `${posX - offsetX}px`;
+      letter.style.top = `${posY - offsetY}px`;
+    };
+    
+    const onMove = (moveEvent) => {
+      const moveX = isTouch ? moveEvent.touches[0].clientX : moveEvent.clientX;
+      const moveY = isTouch ? moveEvent.touches[0].clientY : moveEvent.clientY;
+      moveAt(moveX, moveY);
+    };
+    
+    const onEnd = () => {
+      document.removeEventListener(isTouch ? "touchmove" : "mousemove", onMove);
+      document.removeEventListener(isTouch ? "touchend" : "mouseup", onEnd);
+    };
+    
+    document.addEventListener(isTouch ? "touchmove" : "mousemove", onMove, { passive: false });
+    document.addEventListener(isTouch ? "touchend" : "mouseup", onEnd);
+  };
+
+  letter.addEventListener("mousedown", handleDragStart);
+  letter.addEventListener("touchstart", handleDragStart, { passive: true });
 });
 
 document.querySelector("#openEnvelope").addEventListener("click", () => {
   document.querySelector(".envelope").classList.add("active");
+  document.querySelector(".letters").classList.add("active");
 });
 
 const closeButtons = document.querySelectorAll(".closeLetter");
