@@ -15,55 +15,50 @@ shuffleArray(shuffledThings);
 shuffledThings.forEach((letter) => {
   lettersContainer.appendChild(letter);
   
-  // Soporte para arrastrar con dedo (Touch) o con Mouse
-  const handleDragStart = (e) => {
-    // Evita arrastrar si toca el botón de cerrar o el link de la música
+  // Utilizamos Pointer Events (el estándar moderno para táctil y ratón)
+  letter.addEventListener("pointerdown", (e) => {
+    // Evita arrastrar si toca el botón de cerrar o el enlace
     if (e.target.tagName === "BUTTON" || e.target.tagName === "A") return;
     
-    const isTouch = e.type === "touchstart";
-    const clientX = isTouch ? e.touches[0].clientX : e.clientX;
-    const clientY = isTouch ? e.touches[0].clientY : e.clientY;
-
+    // Captura las coordenadas iniciales del elemento
     const rect = letter.getBoundingClientRect();
-
+    
     letter.style.position = "fixed";
     letter.style.left = `${rect.left}px`;
     letter.style.top = `${rect.top}px`;
 
-    let offsetX = clientX - rect.left;
-    let offsetY = clientY - rect.top;
+    // Calcula la distancia desde donde tocaste hasta el borde de la carta
+    const offsetX = e.clientX - rect.left;
+    const offsetY = e.clientY - rect.top;
 
     letter.style.zIndex = zIndexCounter++;
     
-    const moveAt = (posX, posY) => {
-      letter.style.left = `${posX - offsetX}px`;
-      letter.style.top = `${posY - offsetY}px`;
+    // Función que mueve la carta siguiendo el dedo
+    const onPointerMove = (moveEvent) => {
+      letter.style.left = `${moveEvent.clientX - offsetX}px`;
+      letter.style.top = `${moveEvent.clientY - offsetY}px`;
     };
     
-    const onMove = (moveEvent) => {
-      const moveX = isTouch ? moveEvent.touches[0].clientX : moveEvent.clientX;
-      const moveY = isTouch ? moveEvent.touches[0].clientY : moveEvent.clientY;
-      moveAt(moveX, moveY);
+    // Función que suelta la carta al levantar el dedo
+    const onPointerUp = () => {
+      document.removeEventListener("pointermove", onPointerMove);
+      document.removeEventListener("pointerup", onPointerUp);
+      document.removeEventListener("pointercancel", onPointerUp);
     };
     
-    const onEnd = () => {
-      document.removeEventListener(isTouch ? "touchmove" : "mousemove", onMove);
-      document.removeEventListener(isTouch ? "touchend" : "mouseup", onEnd);
-    };
-    
-    document.addEventListener(isTouch ? "touchmove" : "mousemove", onMove, { passive: false });
-    document.addEventListener(isTouch ? "touchend" : "mouseup", onEnd);
-  };
-
-  letter.addEventListener("mousedown", handleDragStart);
-  letter.addEventListener("touchstart", handleDragStart, { passive: true });
+    document.addEventListener("pointermove", onPointerMove);
+    document.addEventListener("pointerup", onPointerUp);
+    document.addEventListener("pointercancel", onPointerUp);
+  });
 });
 
+// Lógica para abrir el sobre
 document.querySelector("#openEnvelope").addEventListener("click", () => {
   document.querySelector(".envelope").classList.add("active");
   document.querySelector(".letters").classList.add("active");
 });
 
+// Lógica para cerrar cada carta
 const closeButtons = document.querySelectorAll(".closeLetter");
 closeButtons.forEach((button) => {
   button.addEventListener("click", (e) => {
