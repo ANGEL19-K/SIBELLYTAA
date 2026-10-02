@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rompecabezas del Amor</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600;700&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/konva@9.3.6/konva.min.js"></script>
+</head>
+<body>
+    <canvas id="backgroundCanvas"></canvas>
+    <audio id="backgroundMusic" src="amor.mp3" loop preload="none"></audio>
+    <main class="game">
+        <header class="game-header">
+            <p class="eyebrow">PARA MI HERMOSA NOVIA</p>
+            <h1>TE AMO MUCHO MI SIBELLYTA HERMOSA</h1>
+        </header>
+        <section class="game-settings" aria-label="Opciones del rompecabezas">
+            <div class="difficulty-picker">
+                <p class="setting-label">Dificultad</p>
+                <div class="difficulty-control" role="group" aria-label="Cantidad de piezas">
+                    <button class="difficulty-option is-selected" type="button" data-piece-count="12" aria-pressed="true">12 piezas</button>
+                    <button class="difficulty-option" type="button" data-piece-count="24" aria-pressed="false">24 piezas</button>
+                    <button class="difficulty-option" type="button" data-piece-count="48" aria-pressed="false">48 piezas</button>
+                </div>
+            </div>
+            <div class="image-picker">
+                <div class="image-picker-heading">
+                    <div>
+                        <p class="setting-label">Elige una imagen</p>
+                        <p id="imageHelp" class="image-help">Selecciona una de las cuatro fotos del proyecto.</p>
+                    </div>
+                </div>
+                <div id="imageChoices" class="image-choices" role="group" aria-label="Imágenes disponibles"></div>
+            </div>
+        </section>
+        <section id="puzzleWorkspace" class="puzzle-workspace" aria-label="Área del rompecabezas">
+            <div id="boardFrame" class="board-frame" aria-hidden="true"></div>
+            <aside id="pieceTray" class="piece-tray" aria-label="Bandeja de piezas">
+                <div class="tray-heading">
+                    <h2>Piezas</h2>
+                    <span id="pieceCount" aria-live="polite">12 disponibles</span>
+                </div>
+            </aside>
+            <div id="container" role="application" aria-label="Rompecabezas interactivo"></div>
+        </section>
+        <div class="button-container">
+            <button id="previewButton" type="button">Ver imagen</button>
+            <button id="playPauseButton" type="button" aria-label="Reproducir música" aria-pressed="false" title="Reproducir música">♫</button>
+            <button id="resetButton" type="button">Reiniciar</button>
+        </div>
+        <p id="musicStatus" class="music-status" aria-live="polite" hidden></p>
+    </main>
+
+    <div id="previewModal" class="modal" role="dialog" aria-modal="true" aria-label="Vista previa de la imagen">
+        <div class="modal-content preview-content">
+            <img id="previewImage" src="" alt="Imagen completa del rompecabezas">
+            <button class="modal-close" type="button" data-close="previewModal">Cerrar</button>
+        </div>
+    </div>
+
+    <div id="completionModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="completionTitle">
+        <div class="modal-content completion-content">
+            <p class="eyebrow">Para ti mi esposa hermosa</p>
+            <h2 id="completionTitle">Bien hecho mi amor</h2>
+            <p id="winSlogan" class="win-slogan" aria-live="polite"></p>
+            <button class="modal-close" type="button" data-close="completionModal">Cerrar</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
